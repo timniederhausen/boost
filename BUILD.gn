@@ -1,0 +1,12 @@
+config("boost_config") {
+  include_dirs = [ "." ]
+  defines = [ "BOOST_ALL_NO_LIB" ]
+
+  if (is_clang && is_win) {
+    defines += [ "BOOST_USE_WINDOWS_H" ]
+  }
+}
+
+group("boost") {
+  public_configs = [ ":boost_config" ]
+}
