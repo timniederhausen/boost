@@ -1,0 +1,11 @@
+source_set("chrono") {
+  sources = [
+    "src/chrono.cpp",
+    "src/process_cpu_clocks.cpp",
+    "src/thread_clock.cpp",
+  ]
+
+  defines = [ "BOOST_SYSTEM_NO_DEPRECATED" ]
+
+  public_configs = [ "../..:boost_config" ]
+}
