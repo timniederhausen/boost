@@ -1,0 +1,13 @@
+source_set("timer") {
+  sources = [
+    "src/auto_timers_construction.cpp",
+    "src/cpu_timer.cpp",
+  ]
+
+  public_configs = [ "../..:boost_config" ]
+
+  deps = [
+    "../chrono",
+    "../system",
+  ]
+}
