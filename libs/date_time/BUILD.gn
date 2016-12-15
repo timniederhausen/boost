@@ -1,0 +1,16 @@
+config("date_time_config") {
+  defines = [ "DATE_TIME_INLINE" ]
+}
+
+source_set("date_time") {
+  sources = [
+    "src/gregorian/date_generators.cpp",
+    "src/gregorian/greg_month.cpp",
+    "src/gregorian/greg_weekday.cpp",
+  ]
+
+  public_configs = [
+    ":date_time_config",
+    "../..:boost_config",
+  ]
+}

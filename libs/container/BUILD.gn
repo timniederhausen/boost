@@ -1,0 +1,13 @@
+source_set("container") {
+  sources = [
+    "src/alloc_lib.c",
+    "src/dlmalloc.cpp",
+    "src/global_resource.cpp",
+    "src/monotonic_buffer_resource.cpp",
+    "src/pool_resource.cpp",
+    "src/synchronized_pool_resource.cpp",
+    "src/unsynchronized_pool_resource.cpp",
+  ]
+
+  public_configs = [ "../..:boost_config" ]
+}
