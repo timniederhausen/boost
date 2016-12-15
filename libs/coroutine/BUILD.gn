@@ -1,0 +1,20 @@
+source_set("coroutine") {
+  sources = [
+    "src/detail/coroutine_context.cpp",
+    "src/exceptions.cpp",
+  ]
+
+  if (is_win) {
+    sources += [ "src/windows/stack_traits.cpp" ]
+  } else {
+    sources += [ "src/posix/stack_traits.cpp" ]
+  }
+
+  defines = [ "BOOST_COROUTINES_SOURCE" ]
+
+  public_deps = [
+    "../context",
+  ]
+
+  public_configs = [ "../..:boost_config" ]
+}
