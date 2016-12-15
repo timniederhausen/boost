@@ -1,0 +1,18 @@
+source_set("filesystem") {
+  sources = [
+    "src/codecvt_error_category.cpp",
+    "src/operations.cpp",
+    "src/path.cpp",
+    "src/path_traits.cpp",
+    "src/portability.cpp",
+    "src/unique_path.cpp",
+    "src/utf8_codecvt_facet.cpp",
+    "src/windows_file_codecvt.cpp",
+  ]
+
+  public_deps = [
+    "../system",
+  ]
+
+  public_configs = [ "../..:boost_config" ]
+}
