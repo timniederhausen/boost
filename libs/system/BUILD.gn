@@ -1,0 +1,22 @@
+declare_args() {
+  # Keep/remove deprecated declarations.
+  # Sets the BOOST_SYSTEM_NO_DEPRECATED define.
+  boost_system_no_deprecate = true
+}
+
+config("system_config") {
+  if (boost_system_no_deprecate) {
+    defines = [ "BOOST_SYSTEM_NO_DEPRECATED" ]
+  }
+}
+
+source_set("system") {
+  sources = [
+    "src/error_code.cpp",
+  ]
+
+  public_configs = [
+    ":system_config",
+    "../..:boost_config",
+  ]
+}

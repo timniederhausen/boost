@@ -1,0 +1,28 @@
+declare_args() {
+  # Asio can be built as a header only library or a separate compilation.
+  # Enabling this adds the BOOST_ASIO_SEPARATE_COMPILATION define.
+  boost_asio_header_only = false
+}
+
+config("asio_config") {
+  if (!boost_asio_header_only) {
+    defines = [ "BOOST_ASIO_SEPARATE_COMPILATION" ]
+  }
+}
+
+source_set("asio") {
+  if (!boost_asio_header_only) {
+    sources = [
+      "src/asio.cpp",
+    ]
+  }
+
+  public_configs = [
+    ":asio_config",
+    "../..:boost_config",
+  ]
+
+  public_deps = [
+    "../system"
+  ]
+}

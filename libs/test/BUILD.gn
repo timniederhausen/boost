@@ -1,0 +1,96 @@
+config("test_config") {
+  cflags_cc = []
+  if (is_win && is_clang) {
+    cflags_cc += [ "-Wno-microsoft-enum-value" ]
+  }
+}
+
+source_set("prg_exec_monitor") {
+  sources = [
+    "src/cpp_main.cpp",
+    "src/debug.cpp",
+    "src/execution_monitor.cpp",
+  ]
+
+  public_configs = [
+    ":test_config",
+    "../..:boost_config",
+  ]
+
+  deps = [
+    "../timer",
+  ]
+}
+
+source_set("test_exec_monitor") {
+  sources = [
+    "src/compiler_log_formatter.cpp",
+    "src/debug.cpp",
+    "src/decorator.cpp",
+    "src/execution_monitor.cpp",
+    "src/framework.cpp",
+    "src/junit_log_formatter.cpp",
+    "src/plain_report_formatter.cpp",
+    "src/progress_monitor.cpp",
+    "src/results_collector.cpp",
+    "src/results_reporter.cpp",
+    "src/test_main.cpp",
+    "src/test_tools.cpp",
+    "src/test_tree.cpp",
+    "src/unit_test_log.cpp",
+    "src/unit_test_main.cpp",
+    "src/unit_test_monitor.cpp",
+    "src/unit_test_parameters.cpp",
+    "src/xml_log_formatter.cpp",
+    "src/xml_report_formatter.cpp",
+  ]
+
+  public_configs = [
+    ":test_config",
+    "../..:boost_config",
+  ]
+
+  deps = [
+    "../timer",
+  ]
+}
+
+source_set("unit_test_framework") {
+  sources = [
+    "src/compiler_log_formatter.cpp",
+    "src/debug.cpp",
+    "src/decorator.cpp",
+    "src/execution_monitor.cpp",
+    "src/framework.cpp",
+    "src/junit_log_formatter.cpp",
+    "src/plain_report_formatter.cpp",
+    "src/progress_monitor.cpp",
+    "src/results_collector.cpp",
+    "src/results_reporter.cpp",
+    "src/test_tools.cpp",
+    "src/test_tree.cpp",
+    "src/unit_test_log.cpp",
+    "src/unit_test_main.cpp",
+    "src/unit_test_monitor.cpp",
+    "src/unit_test_parameters.cpp",
+    "src/xml_log_formatter.cpp",
+    "src/xml_report_formatter.cpp",
+  ]
+
+  public_configs = [
+    ":test_config",
+    "../..:boost_config",
+  ]
+
+  deps = [
+    "../timer",
+  ]
+}
+
+group("test") {
+  deps = [
+    ":prg_exec_monitor",
+    ":test_exec_monitor",
+    ":unit_test_framework",
+  ]
+}
