@@ -11,3 +11,6 @@
 /.settings/
 /.project
 /.pydevproject
+
+**/doc/*
+*.html
