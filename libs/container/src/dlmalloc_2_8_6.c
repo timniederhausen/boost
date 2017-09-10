@@ -1527,7 +1527,7 @@ LONG __cdecl _InterlockedExchange(LONG volatile *Target, LONG Value);
 #endif
 
 /* Declarations for bit scanning on win32 */
-#if defined(_MSC_VER) && _MSC_VER>=1300
+#if defined(_MSC_VER) && _MSC_VER>=1300 && !defined(__clang__)
 #ifndef BitScanForward /* Try to avoid pulling in WinNT.h */
 #ifdef __cplusplus
 extern "C" {
@@ -2829,7 +2829,7 @@ static size_t traverse_and_check(mstate m);
 #define treebin_at(M,i)     (&((M)->treebins[i]))
 
 /* assign tree index for size S to variable I. Use x86 asm if possible  */
-#if defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__))
+#if defined(__clang__) || (defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__)))
 #define compute_tree_index(S, I)\
 {\
   unsigned int X = S >> TREEBIN_SHIFT;\
@@ -2932,7 +2932,7 @@ static size_t traverse_and_check(mstate m);
 
 /* index corresponding to given bit. Use x86 asm if possible */
 
-#if defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__))
+#if defined(__clang__) || (defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__)))
 #define compute_bit2idx(X, I)\
 {\
   unsigned int J;\
