@@ -2,11 +2,24 @@ declare_args() {
   # Asio can be built as a header only library or a separate compilation.
   # Enabling this adds the BOOST_ASIO_SEPARATE_COMPILATION define.
   boost_asio_header_only = false
+
+  # Define BOOST_ASIO_ENABLE_CANCELIO
+  boost_asio_enable_cancelio = false
+
+  # Define BOOST_ASIO_HAS_STD_CHRONO
+  boost_asio_has_std_chrono = false
 }
 
 config("asio_config") {
+  defines = []
   if (!boost_asio_header_only) {
-    defines = [ "BOOST_ASIO_SEPARATE_COMPILATION" ]
+    defines += [ "BOOST_ASIO_SEPARATE_COMPILATION" ]
+  }
+  if (boost_asio_enable_cancelio) {
+    defines += [ "BOOST_ASIO_ENABLE_CANCELIO" ]
+  }
+  if (boost_asio_has_std_chrono) {
+    defines += [ "BOOST_ASIO_HAS_STD_CHRONO" ]
   }
 }
 
