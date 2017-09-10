@@ -73,6 +73,10 @@ void winsock_init_base::throw_on_error(data& d)
   }
 }
 
+// Static variable to ensure that winsock is initialised before main, and
+// therefore before any other threads can get started.
+static const winsock_init<>& winsock_init_instance = winsock_init<>(false);
+
 } // namespace detail
 } // namespace asio
 } // namespace boost
