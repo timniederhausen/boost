@@ -32,6 +32,12 @@
 #   endif
 # endif
 
+# ifdef BOOST_ERROR_CODE_HEADER_ONLY
+#   define BOOST_ERROR_CODE_HEADER_ONLY_INLINE inline
+# else
+#   define BOOST_ERROR_CODE_HEADER_ONLY_INLINE
+# endif
+
 //--------------------------------------------------------------------------------------//
 namespace boost
 {
@@ -68,12 +74,12 @@ namespace detail
 
   //  generic_error_category implementation  ---------------------------------//
 
-  BOOST_SYSTEM_INLINE const char * generic_error_category::name() const BOOST_SYSTEM_NOEXCEPT
+  BOOST_ERROR_CODE_HEADER_ONLY_INLINE const char * generic_error_category::name() const BOOST_SYSTEM_NOEXCEPT
   {
     return "generic";
   }
 
-  BOOST_SYSTEM_INLINE std::string generic_error_category::message( int ev ) const
+  BOOST_ERROR_CODE_HEADER_ONLY_INLINE std::string generic_error_category::message( int ev ) const
   {
     using namespace boost::system::errc;
 #if defined(__PGI)
@@ -166,12 +172,12 @@ namespace detail
   }
   //  system_error_category implementation  --------------------------------------------//
 
-  BOOST_SYSTEM_INLINE const char * system_error_category::name() const BOOST_SYSTEM_NOEXCEPT
+  BOOST_ERROR_CODE_HEADER_ONLY_INLINE const char * system_error_category::name() const BOOST_SYSTEM_NOEXCEPT
   {
     return "system";
   }
 
-  BOOST_SYSTEM_INLINE error_condition system_error_category::default_error_condition( int ev ) const
+  BOOST_ERROR_CODE_HEADER_ONLY_INLINE error_condition system_error_category::default_error_condition( int ev ) const
     BOOST_SYSTEM_NOEXCEPT
   {
     using namespace boost::system::errc;
@@ -376,13 +382,13 @@ namespace detail
 
 # if !defined( BOOST_WINDOWS_API )
 
-  BOOST_SYSTEM_INLINE std::string system_error_category::message( int ev ) const
+  BOOST_ERROR_CODE_HEADER_ONLY_INLINE std::string system_error_category::message( int ev ) const
   {
     return generic_category().message( ev );
   }
 # else
 
-  BOOST_SYSTEM_INLINE std::string system_error_category::message( int ev ) const
+  BOOST_ERROR_CODE_HEADER_ONLY_INLINE std::string system_error_category::message( int ev ) const
   {
 #if defined(UNDER_CE) || BOOST_PLAT_WINDOWS_RUNTIME || defined(BOOST_NO_ANSI_APIS)
     std::wstring buf(128, wchar_t());
@@ -494,3 +500,5 @@ namespace detail
 
   } // namespace system
 } // namespace boost
+
+# undef BOOST_ERROR_CODE_HEADER_ONLY_INLINE

@@ -20,6 +20,7 @@ obj ssse3 : ssse3.cpp
         <toolset>intel-linux:<cxxflags>"-xSSSE3"
         <toolset>intel-darwin:<cxxflags>"-xSSSE3"
         <toolset>intel-win:<cxxflags>"/QxSSSE3"
+        <toolset>msvc,<address-model>32:<cxxflags>"/arch:SSE2"
     ;
 
 obj avx2 : avx2.cpp
@@ -29,6 +30,6 @@ obj avx2 : avx2.cpp
         <toolset>intel-linux:<cxxflags>"-xCORE-AVX2 -fabi-version=0"
         <toolset>intel-darwin:<cxxflags>"-xCORE-AVX2 -fabi-version=0"
         <toolset>intel-win:<cxxflags>"/arch:CORE-AVX2"
-        <toolset>msvc:<cxxflags>"/arch:AVX"
+        <toolset>msvc:<cxxflags>"/arch:AVX2"
     ;
 

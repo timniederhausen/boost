@@ -1023,6 +1023,12 @@ namespace std{ using ::type_info; }
 #  define BOOST_NO_CXX11_FIXED_LENGTH_VARIADIC_TEMPLATE_EXPANSION_PACKS
 #endif
 
+#if defined(BOOST_MSVC) && BOOST_MSVC_FULL_VER >= 190023918
+#  define BOOST_EMPTYBASES __declspec(empty_bases)
+#else
+#  define BOOST_EMPTYBASES
+#endif
+
 //
 // Finish off with checks for macros that are depricated / no longer supported,
 // if any of these are set then it's very likely that much of Boost will no

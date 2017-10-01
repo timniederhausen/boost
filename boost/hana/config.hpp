@@ -136,6 +136,12 @@ Distributed under the Boost Software License, Version 1.0.
 #   define BOOST_HANA_CONSTEXPR_STATELESS_LAMBDA /* nothing */
 #endif
 
+#if (defined(__cpp_constexpr) && (__cpp_constexpr >= 201603)) ||            \
+        (defined(_MSC_VER) && (_MSC_VER >= 1911) &&                         \
+            defined(_MSVC_LANG) && (_MSVC_LANG > 201402))
+#   define BOOST_HANA_CONFIG_HAS_CONSTEXPR_LAMBDA
+#endif
+
 // `BOOST_HANA_CONSTEXPR_LAMBDA` expands to `constexpr` if constexpr lambdas
 // are supported and to nothing otherwise.
 #if defined(BOOST_HANA_CONFIG_HAS_CONSTEXPR_LAMBDA)

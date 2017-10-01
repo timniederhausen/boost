@@ -77,6 +77,7 @@
 #include <boost/range/algorithm/sort.hpp>
 #include <boost/range/algorithm/stable_partition.hpp>
 #include <boost/range/algorithm/stable_sort.hpp>
+#include <boost/range/algorithm/swap_ranges.hpp>
 #include <boost/range/algorithm/transform.hpp>
 #include <boost/range/algorithm/unique.hpp>
 #include <boost/range/algorithm/unique_copy.hpp>

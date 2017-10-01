@@ -17,6 +17,7 @@
 //  See http://www.boost.org for updates, documentation, and revision history.
 
 #include <boost/assert.hpp>
+#include <boost/detail/workaround.hpp>
 
 #include <boost/serialization/throw_exception.hpp>
 
@@ -43,7 +44,7 @@ class xml_unescape
     }
 public:
     // workaround msvc 7.1 ICU crash
-    #if defined(BOOST_MSVC)
+    #if defined(BOOST_MSVC) && BOOST_WORKAROUND( BOOST_MSVC, < 1500 )
         typedef int value_type;
     #else
         typedef typename this_t::value_type value_type;

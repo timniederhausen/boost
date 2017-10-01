@@ -13,7 +13,7 @@
 #include <boost/core/enable_if.hpp>
 #include <boost/core/null_deleter.hpp>
 #include <boost/random/mersenne_twister.hpp>
-#include <boost/random/uniform_int.hpp>
+#include <boost/random/uniform_int_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/tti/has_member_function.hpp>
@@ -49,7 +49,7 @@ namespace detail {
 template <typename UniformRandomNumberGenerator>
 class basic_random_generator {
 private:
-    typedef uniform_int<unsigned long> distribution_type;
+    typedef random::uniform_int_distribution<unsigned long> distribution_type;
     typedef variate_generator<UniformRandomNumberGenerator*, distribution_type> generator_type;
 
 public:
@@ -62,10 +62,7 @@ public:
         : pURNG(new UniformRandomNumberGenerator)
         , generator
           ( pURNG.get()
-          , distribution_type
-            ( (std::numeric_limits<unsigned long>::min)()
-            , (std::numeric_limits<unsigned long>::max)()
-            )
+          , distribution_type()
           )
     {
         // seed the random number generator if it is capable
@@ -78,10 +75,7 @@ public:
         : pURNG(&gen, boost::null_deleter())
         , generator
           ( pURNG.get()
-          , distribution_type
-            ( (std::numeric_limits<unsigned long>::min)()
-            , (std::numeric_limits<unsigned long>::max)()
-            )
+          , distribution_type()
           )
     {}
 
@@ -91,10 +85,7 @@ public:
         : pURNG(pGen, boost::null_deleter())
         , generator
           ( pURNG.get()
-          , distribution_type
-            ( (std::numeric_limits<unsigned long>::min)()
-            , (std::numeric_limits<unsigned long>::max)()
-            )
+          , distribution_type()
           )
     {
         BOOST_ASSERT(pURNG);
