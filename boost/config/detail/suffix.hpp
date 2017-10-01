@@ -1152,6 +1152,12 @@ namespace std{ using ::type_info; }
 #  define BOOST_NO_CXX11_FIXED_LENGTH_VARIADIC_TEMPLATE_EXPANSION_PACKS
 #endif
 
+
+#if defined(BOOST_MSVC) && BOOST_MSVC_FULL_VER >= 190023918
+#  define BOOST_EMPTYBASES __declspec(empty_bases)
+#else
+#  define BOOST_EMPTYBASES
+#endif
 // This is a catch all case for obsolete compilers / std libs:
 #if !defined(_YVALS) && !defined(_CPPLIB_VER)  // msvc std lib already configured
 #if (!defined(__has_include) || (__cplusplus < 201700))

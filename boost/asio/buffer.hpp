@@ -30,7 +30,8 @@
 #include <boost/asio/is_contiguous_iterator.hpp>
 
 #if defined(BOOST_ASIO_MSVC) && (BOOST_ASIO_MSVC >= 1700)
-# if defined(_HAS_ITERATOR_DEBUGGING) && (_HAS_ITERATOR_DEBUGGING != 0)
+# if (defined(_HAS_ITERATOR_DEBUGGING) && (_HAS_ITERATOR_DEBUGGING != 0)) \
+    || (defined(_ITERATOR_DEBUG_LEVEL) && (_ITERATOR_DEBUG_LEVEL == 2))
 #  if !defined(BOOST_ASIO_DISABLE_BUFFER_DEBUGGING)
 #   define BOOST_ASIO_ENABLE_BUFFER_DEBUGGING
 #  endif // !defined(BOOST_ASIO_DISABLE_BUFFER_DEBUGGING)

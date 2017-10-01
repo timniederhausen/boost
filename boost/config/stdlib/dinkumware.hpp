@@ -154,9 +154,9 @@
 #endif
 
 // Before 650 std::pointer_traits has a broken rebind template
-#if !defined(_CPPLIB_VER) || _CPPLIB_VER < 650
+#if !defined(_CPPLIB_VER) || (_CPPLIB_VER < 650)
 #  define BOOST_NO_CXX11_POINTER_TRAITS
-#elif defined(BOOST_MSVC) && BOOST_MSVC < 1910
+#elif (defined(BOOST_MSVC) || (defined(__clang__) && defined(_MSC_VER))) && (_MSC_VER < 1910)
 #  define BOOST_NO_CXX11_POINTER_TRAITS
 #endif
 
@@ -235,7 +235,10 @@
 // If _HAS_AUTO_PTR_ETC is defined to 0, std::auto_ptr and std::random_shuffle are not available.
 // See https://www.visualstudio.com/en-us/news/vs2015-vs.aspx#C++
 // and http://blogs.msdn.com/b/vcblog/archive/2015/06/19/c-11-14-17-features-in-vs-2015-rtm.aspx
-#  if defined(_HAS_AUTO_PTR_ETC) && (_HAS_AUTO_PTR_ETC == 0)
+#  if (defined(_HAS_AUTO_PTR_ETC) && !_HAS_AUTO_PTR_ETC) || (!defined(_HAS_AUTO_PTR_ETC) && \
+        ((defined(_HAS_CXX17) && _HAS_CXX17) || (!defined(_HAS_CXX17) && \
+          ((defined(BOOST_MSVC) && defined(_MSVC_LANG) && (_MSVC_LANG > 201402)) || \
+           (defined(__clang__) && (__cplusplus > 201402))))))
 #    define BOOST_NO_AUTO_PTR
 #    define BOOST_NO_CXX98_RANDOM_SHUFFLE
 #    define BOOST_NO_CXX98_FUNCTION_BASE

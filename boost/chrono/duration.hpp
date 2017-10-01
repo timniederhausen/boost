@@ -435,9 +435,9 @@ namespace chrono {
 
 #if  defined   BOOST_CHRONO_DURATION_DEFAULTS_TO_ZERO
         BOOST_FORCEINLINE BOOST_CONSTEXPR
-        duration() : rep_(duration_values<rep>::zero()) { }
+        duration() BOOST_NOEXCEPT_OR_NOTHROW : rep_(duration_values<rep>::zero()) { }
 #elif  defined   BOOST_NO_CXX11_DEFAULTED_FUNCTIONS
-        BOOST_CONSTEXPR duration() {}
+        BOOST_CONSTEXPR duration() BOOST_NOEXCEPT_OR_NOTHROW {}
 #else
         BOOST_CONSTEXPR duration()  = default;
 #endif
@@ -458,7 +458,7 @@ namespace chrono {
                 >::type* = BOOST_NULLPTR
             ) : rep_(r) { }
 #if  defined   BOOST_NO_CXX11_DEFAULTED_FUNCTIONS
-        duration& operator=(const duration& rhs)
+        duration& operator=(const duration& rhs) BOOST_NOEXCEPT_OR_NOTHROW
         {
             if (&rhs != this) rep_= rhs.rep_;
             return *this;
