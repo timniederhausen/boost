@@ -395,7 +395,7 @@ rule avx2-targets-cond ( properties * )
             }
             else if <toolset>msvc in $(properties)
             {
-                result = <cxxflags>"/arch:AVX" ;
+                result = <cxxflags>"/arch:AVX2" ;
             }
         }
     }

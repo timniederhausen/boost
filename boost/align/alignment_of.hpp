@@ -8,10 +8,11 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef BOOST_ALIGN_ALIGNMENT_OF_HPP
 #define BOOST_ALIGN_ALIGNMENT_OF_HPP
 
+#include <boost/detail/workaround.hpp>
 #include <boost/align/detail/element_type.hpp>
 #include <boost/align/alignment_of_forward.hpp>
 
-#if defined(BOOST_MSVC)
+#if defined(BOOST_MSVC) && BOOST_WORKAROUND( BOOST_MSVC, < 1900 )
 #include <boost/align/detail/alignment_of_msvc.hpp>
 #elif defined(__GNUC__) && defined(__unix__) && !defined(__LP64__)
 #include <boost/align/detail/alignment_of.hpp>

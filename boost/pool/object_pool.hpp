@@ -21,7 +21,7 @@ It also provides automatic destruction of non-deallocated objects.
 #include <boost/pool/pool.hpp>
 
 // The following code will be put into Boost.Config in a later revision
-#if defined(BOOST_MSVC) || defined(__KCC)
+#if (defined(BOOST_MSVC) && BOOST_MSVC < 1900) || defined(__KCC)
 # define BOOST_NO_TEMPLATE_CV_REF_OVERLOADS
 #endif
 

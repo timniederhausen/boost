@@ -889,7 +889,7 @@ namespace detail
 
   class directory_iterator
     : public boost::iterator_facade< directory_iterator,
-                                     directory_entry,
+                                     const directory_entry,
                                      boost::single_pass_traversal_tag >
   {
   public:
@@ -929,7 +929,7 @@ namespace detail
 
     boost::iterator_facade<
       directory_iterator,
-      directory_entry,
+      const directory_entry,
       boost::single_pass_traversal_tag >::reference dereference() const 
     {
       BOOST_ASSERT_MSG(m_imp.get(), "attempt to dereference end iterator");
@@ -1144,7 +1144,7 @@ namespace filesystem
   class recursive_directory_iterator
     : public boost::iterator_facade<
         recursive_directory_iterator,
-        directory_entry,
+        const directory_entry,
         boost::single_pass_traversal_tag >
   {
   public:
@@ -1269,7 +1269,7 @@ namespace filesystem
 
     boost::iterator_facade< 
       recursive_directory_iterator,
-      directory_entry,
+      const directory_entry,
       boost::single_pass_traversal_tag >::reference
     dereference() const 
     {

@@ -21,6 +21,9 @@ namespace detail {
 
     template <class T1, class T2>
     struct eq {
+        typedef T1 first_argument_type;
+        typedef T2 second_argument_type;
+        typedef bool result_type;
         bool operator () ( const T1& v1, const T2& v2 ) const { return v1 == v2 ;}
         };
     
