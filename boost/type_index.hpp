@@ -25,7 +25,7 @@
 #   ifdef BOOST_HAS_PRAGMA_DETECT_MISMATCH
 #       pragma detect_mismatch( "boost__type_index__abi", "user defined type_index class is used: " BOOST_STRINGIZE(BOOST_TYPE_INDEX_USER_TYPEINDEX))
 #   endif
-#elif (!defined(BOOST_NO_RTTI) && !defined(BOOST_TYPE_INDEX_FORCE_NO_RTTI_COMPATIBILITY)) || defined(BOOST_MSVC)
+#elif (!defined(BOOST_NO_RTTI) && !defined(BOOST_TYPE_INDEX_FORCE_NO_RTTI_COMPATIBILITY)) || (defined(BOOST_MSVC) && BOOST_MSVC < 1910)
 #   include <boost/type_index/stl_type_index.hpp>
 #   if defined(BOOST_NO_RTTI) || defined(BOOST_TYPE_INDEX_FORCE_NO_RTTI_COMPATIBILITY)
 #       include <boost/type_index/detail/stl_register_class.hpp>
@@ -128,7 +128,7 @@ namespace boost { namespace typeindex {
     typedef platform_specific type_index;
 #elif defined(BOOST_TYPE_INDEX_USER_TYPEINDEX)
     // Nothing to do
-#elif (!defined(BOOST_NO_RTTI) && !defined(BOOST_TYPE_INDEX_FORCE_NO_RTTI_COMPATIBILITY)) || defined(BOOST_MSVC)
+#elif (!defined(BOOST_NO_RTTI) && !defined(BOOST_TYPE_INDEX_FORCE_NO_RTTI_COMPATIBILITY)) || (defined(BOOST_MSVC) && BOOST_MSVC < 1910)
     typedef boost::typeindex::stl_type_index type_index;
 #else 
     typedef boost::typeindex::ctti_type_index type_index;

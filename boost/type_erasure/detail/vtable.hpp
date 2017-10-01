@@ -31,7 +31,7 @@ namespace boost {
 namespace type_erasure {
 namespace detail {
 
-#if !defined(BOOST_NO_CXX11_VARIADIC_TEMPLATES) && !defined(BOOST_NO_CXX11_CONSTEXPR) && !defined(BOOST_NO_CXX11_DEFAULTED_FUNCTIONS)
+#if !defined(BOOST_NO_CXX11_VARIADIC_TEMPLATES) && !defined(BOOST_NO_CXX11_CONSTEXPR) && !defined(BOOST_NO_CXX11_DEFAULTED_FUNCTIONS) && (!defined(BOOST_MSVC) || BOOST_MSVC_FULL_VER > 190023026)
 
 template<class... T>
 struct stored_arg_pack;

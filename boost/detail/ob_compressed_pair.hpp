@@ -49,7 +49,7 @@ namespace boost
 //
 
 template <class T1, class T2>
-class compressed_pair;
+class BOOST_EMPTYBASES compressed_pair;
 
 namespace detail{
 
@@ -142,7 +142,7 @@ public:
 
 // T1 != T2, T2 empty
 template <class T1, class T2>
-class compressed_pair_1 : T2
+class BOOST_EMPTYBASES compressed_pair_1 : T2
 {
 private:
    T1 _first;
@@ -184,7 +184,7 @@ public:
 
 // T1 != T2, T1 empty
 template <class T1, class T2>
-class compressed_pair_2 : T1
+class BOOST_EMPTYBASES compressed_pair_2 : T1
 {
 private:
    T2 _second;
@@ -233,7 +233,7 @@ public:
 
 // T1 != T2, both empty
 template <class T1, class T2>
-class compressed_pair_3 : T1, T2
+class BOOST_EMPTYBASES compressed_pair_3 : T1, T2
 {
 public:
    typedef T1                                                 first_type;
@@ -269,7 +269,7 @@ public:
 
 // T1 == T2, and empty
 template <class T1, class T2>
-class compressed_pair_4 : T1
+class BOOST_EMPTYBASES compressed_pair_4 : T1
 {
 public:
    typedef T1                                                 first_type;
@@ -413,7 +413,7 @@ public:
 } // namespace detail
 
 template <class T1, class T2>
-class compressed_pair : public detail::compressed_pair_traits<T1, T2>::type
+class BOOST_EMPTYBASES compressed_pair : public detail::compressed_pair_traits<T1, T2>::type
 {
 private:
    typedef typename detail::compressed_pair_traits<T1, T2>::type base_type;
