@@ -131,7 +131,7 @@ import path ;
 import link ;
 
 path-constant BOOST_ROOT : . ;
-constant BOOST_VERSION : 1.63.0 ;
+constant BOOST_VERSION : 1.65.1 ;
 constant BOOST_JAMROOT_MODULE : $(__name__) ;
 
 boostcpp.set-version $(BOOST_VERSION) ;
@@ -248,12 +248,12 @@ for local l in $(all-libraries)
     use-project /boost/$(l) : libs/$(l)/build ;
 }
 
-if [ path.exists $(BOOST_ROOT)/tools/inspect ]
+if [ path.exists $(BOOST_ROOT)/tools/inspect/build ]
 {
     use-project /boost/tools/inspect : tools/inspect/build ;
 }
 
-if [ path.exists $(BOOST_ROOT)/libs/wave/tool ]
+if [ path.exists $(BOOST_ROOT)/libs/wave/tool/build ]
 {
     use-project /boost/libs/wave/tool : libs/wave/tool/build ;
 }
@@ -288,7 +288,7 @@ rule boost-install ( libraries * )
 rule boost-lib ( name : sources * : requirements * : default-build * : usage-requirements * )
 {
     name = boost_$(name) ;
-    autolink = <link>shared:<define>BOOST_$(name:U)_DYN_LINK=1 ;
+    autolink = <link>shared:<define>$(name:U)_DYN_LINK=1 ;
     lib $(name)
         : $(sources)
         : $(requirements) $(autolink)

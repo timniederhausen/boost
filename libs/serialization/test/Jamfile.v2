@@ -84,6 +84,7 @@ test-suite "serialization" :
      [ test-bsl-run_files test_list : A ]
      [ test-bsl-run_files test_list_ptrs : A ]
      [ test-bsl-run_files test_map : A ]
+     [ test-bsl-run_files test_map_hashed : A : : [ requires hash ] ] # BOOST_HAS_HASH
      [ test-bsl-run_files test_map_unordered : A : :  [ requires cxx11_hdr_unordered_map ] ] # BOOST_NO_CXX11_HDR_UNORDERED_MAP
      [ test-bsl-run_files test_map_boost_unordered : A ]
      [ test-bsl-run_files test_mi ]
@@ -107,6 +108,8 @@ test-suite "serialization" :
      [ test-bsl-run_files test_set_boost_unordered : A ]
      [ test-bsl-run_files test_simple_class : A ]
      [ test-bsl-run_files test_simple_class_ptr : A ]
+     [ test-bsl-run_files test_slist : A : : [ requires slist ] ] # BOOST_HAS_SLIST ]
+     [ test-bsl-run_files test_slist_ptrs : A : : [ requires slist ] ] # BOOST_HAS_SLIST ] ]
      [ test-bsl-run_files test_split ]
      [ test-bsl-run_files test_stack : A ]
      [ test-bsl-run_files test_tracking ]
@@ -123,6 +126,9 @@ test-suite "serialization" :
      [ test-bsl-run_polymorphic_archive test_polymorphic : test_polymorphic_A A ]
      [ test-bsl-run_polymorphic_archive test_polymorphic2 : test_polymorphic2imp ]
      [ test-bsl-run_polymorphic_archive test_polymorphic_helper ]
+
+     # should compile
+     [ compile test_strong_typedef.cpp ]
     ;
 
 if ! $(BOOST_ARCHIVE_LIST) {
@@ -141,15 +147,10 @@ if ! $(BOOST_ARCHIVE_LIST) {
         [ test-bsl-run test_iterators ]
         [ test-bsl-run test_iterators_base64 ]
         [ test-bsl-run test_smart_cast ]
-        [ test-bsl-run test_utf8_codecvt 
-            : 
-            :
-            : <dependency>../../config/test/all//BOOST_NO_STD_WSTREAMBUF
-        ]
         [ test-bsl-run test_codecvt_null 
             : ../src/codecvt_null
             :
-            : <dependency>../../config/test/all//BOOST_NO_STD_WSTREAMBUF
+            : [ requires std_wstreambuf ]
         ]
         
         #[ test-bsl-run test_z ]

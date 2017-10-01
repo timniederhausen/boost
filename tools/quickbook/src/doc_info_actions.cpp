@@ -38,6 +38,12 @@ namespace quickbook
         }
     }
 
+    char const* doc_info_attribute_name(value::tag_type tag)
+    {
+        return doc_attributes::is_tag(tag) ? doc_attributes::name(tag) :
+            doc_info_attributes::name(tag);
+    }
+
     // Each docinfo attribute is stored in a value list, these are then stored
     // in a sorted value list. The following convenience methods extract all the
     // values for an attribute tag.
@@ -54,7 +60,7 @@ namespace quickbook
             ++count;
         }
 
-        if(count > 1) duplicates->push_back(doc_info_attributes::name(tag));
+        if(count > 1) duplicates->push_back(doc_info_attribute_name(tag));
 
         return p;
     }
@@ -550,9 +556,16 @@ namespace quickbook
 
         // Close any open sections.
         if (!doc_type.empty() && state.document.section_level() > 1) {
-            detail::outwarn(state.current_file->path)
-                << "Missing [endsect] detected at end of file."
-                << std::endl;
+            if (state.strict_mode) {
+                detail::outerr(state.current_file->path)
+                    << "Missing [endsect] detected at end of file (strict mode)."
+                    << std::endl;
+                ++state.error_count;
+            } else {
+                detail::outwarn(state.current_file->path)
+                    << "Missing [endsect] detected at end of file."
+                    << std::endl;
+            }
 
             while(state.document.section_level() > 1) {
                 state.out << "</section>";

@@ -40,7 +40,7 @@
 #pragma warning(disable:4355)
 #endif
 
-#define QUICKBOOK_VERSION "Quickbook Version 1.6.2"
+#define QUICKBOOK_VERSION "Quickbook Version 1.6.4"
 
 namespace quickbook
 {
@@ -62,7 +62,7 @@ namespace quickbook
                 end = preset_defines.end();
                 it != end; ++it)
         {
-            boost::string_ref val(*it);
+            quickbook::string_view val(*it);
             parse_iterator first(val.begin());
             parse_iterator last(val.end());
 
@@ -118,12 +118,14 @@ namespace quickbook
             indent(-1),
             linewidth(-1),
             pretty_print(true),
+            strict_mode(false),
             deps_out_flags(quickbook::dependency_tracker::default_)
         {}
 
         int indent;
         int linewidth;
         bool pretty_print;
+        bool strict_mode;
         fs::path deps_out;
         quickbook::dependency_tracker::flags deps_out_flags;
         fs::path locations_out;
@@ -143,6 +145,7 @@ namespace quickbook
 
         try {
             quickbook::state state(filein_, options_.xinclude_base, buffer, output);
+            state.strict_mode = options_.strict_mode;
             set_macros(state);
 
             if (state.error_count == 0) {
@@ -279,13 +282,14 @@ main(int argc, char* argv[])
             ("help", "produce help message")
             ("version", "print version string")
             ("no-pretty-print", "disable XML pretty printing")
+            ("strict", "strict mode")
             ("no-self-linked-headers", "stop headers linking to themselves")
             ("indent", PO_VALUE<int>(), "indent spaces")
             ("linewidth", PO_VALUE<int>(), "line width")
             ("input-file", PO_VALUE<command_line_string>(), "input file")
             ("output-file", PO_VALUE<command_line_string>(), "output file")
+            ("no-output", "don't write out the result (overriden by --output-file)")
             ("output-deps", PO_VALUE<command_line_string>(), "output dependency file")
-            ("debug", "debug mode (for developers)")
             ("ms-errors", "use Microsoft Visual Studio style error & warn message format")
             ("include-path,I", PO_VALUE< std::vector<command_line_string> >(), "include path")
             ("define,D", PO_VALUE< std::vector<command_line_string> >(), "define macro")
@@ -293,6 +297,7 @@ main(int argc, char* argv[])
         ;
 
         hidden.add_options()
+            ("debug", "debug mode")
             ("expect-errors",
                 "Succeed if the input file contains a correctly handled "
                 "error, fail otherwise.")
@@ -382,7 +387,9 @@ main(int argc, char* argv[])
         if (vm.count("no-pretty-print"))
             parse_document_options.pretty_print = false;
 
-        quickbook::self_linked_headers = !vm.count("no-self-link-headers");
+        parse_document_options.strict_mode = !!vm.count("strict");
+
+        quickbook::self_linked_headers = !vm.count("no-self-linked-headers");
 
         if (vm.count("indent"))
             parse_document_options.indent = vm["indent"].as<int>();
@@ -440,6 +447,11 @@ main(int argc, char* argv[])
             fs::path fileout;
 
             bool default_output = true;
+
+            if (vm.count("no-output"))
+            {
+                default_output = false;
+            }
 
             if (vm.count("output-deps"))
             {
