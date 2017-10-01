@@ -26,6 +26,7 @@
 #include <boost/range/adaptor/strided.hpp>
 #include <boost/range/adaptor/tokenized.hpp>
 #include <boost/range/adaptor/transformed.hpp>
+#include <boost/range/adaptor/type_erased.hpp>
 #include <boost/range/adaptor/uniqued.hpp>
 
 #endif

@@ -12,7 +12,7 @@
 #define BOOST_STRING_UTIL_DETAIL_HPP
 
 #include <boost/algorithm/string/config.hpp>
-#include <functional>
+#include <cstddef>
 #include <boost/range/iterator_range_core.hpp>
 
 namespace boost {
