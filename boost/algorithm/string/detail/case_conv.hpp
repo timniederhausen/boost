@@ -13,7 +13,7 @@
 
 #include <boost/algorithm/string/config.hpp>
 #include <locale>
-#include <functional>
+#include <algorithm>
 
 #include <boost/type_traits/make_unsigned.hpp>
 
