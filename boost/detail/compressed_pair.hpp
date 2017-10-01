@@ -35,7 +35,7 @@ namespace boost
 {
 
 template <class T1, class T2>
-class compressed_pair;
+class BOOST_EMPTYBASES compressed_pair;
 
 
 // compressed_pair
@@ -70,7 +70,7 @@ namespace details
    struct compressed_pair_switch<T1, T2, true, false, false>
       {static const int value = 5;};
 
-   template <class T1, class T2, int Version> class compressed_pair_imp;
+   template <class T1, class T2, int Version> class BOOST_EMPTYBASES compressed_pair_imp;
 
 #ifdef __GNUC__
    // workaround for GCC (JM):
@@ -93,7 +93,7 @@ namespace details
    // 0    derive from neither
 
    template <class T1, class T2>
-   class compressed_pair_imp<T1, T2, 0>
+   class BOOST_EMPTYBASES compressed_pair_imp<T1, T2, 0>
    {
    public:
       typedef T1                                                 first_type;
@@ -135,7 +135,7 @@ namespace details
    // 1    derive from T1
 
    template <class T1, class T2>
-   class compressed_pair_imp<T1, T2, 1>
+   class BOOST_EMPTYBASES compressed_pair_imp<T1, T2, 1>
       : protected ::boost::remove_cv<T1>::type
    {
    public:
@@ -177,7 +177,7 @@ namespace details
    // 2    derive from T2
 
    template <class T1, class T2>
-   class compressed_pair_imp<T1, T2, 2>
+   class BOOST_EMPTYBASES compressed_pair_imp<T1, T2, 2>
       : protected ::boost::remove_cv<T2>::type
    {
    public:
@@ -220,7 +220,7 @@ namespace details
    // 3    derive from T1 and T2
 
    template <class T1, class T2>
-   class compressed_pair_imp<T1, T2, 3>
+   class BOOST_EMPTYBASES compressed_pair_imp<T1, T2, 3>
       : protected ::boost::remove_cv<T1>::type,
         protected ::boost::remove_cv<T2>::type
    {
@@ -263,7 +263,7 @@ namespace details
    //      of T2 just in case the user is relying on first() and second() returning
    //      different objects (albeit both empty).
    template <class T1, class T2>
-   class compressed_pair_imp<T1, T2, 4>
+   class BOOST_EMPTYBASES compressed_pair_imp<T1, T2, 4>
       : protected ::boost::remove_cv<T1>::type
    {
    public:
@@ -298,7 +298,7 @@ namespace details
    // 5    T1 == T2 and are not empty:   //JM
 
    template <class T1, class T2>
-   class compressed_pair_imp<T1, T2, 5>
+   class BOOST_EMPTYBASES compressed_pair_imp<T1, T2, 5>
    {
    public:
       typedef T1                                                 first_type;
@@ -337,7 +337,7 @@ namespace details
 }  // details
 
 template <class T1, class T2>
-class compressed_pair
+class BOOST_EMPTYBASES compressed_pair
    : private ::boost::details::compressed_pair_imp<T1, T2,
              ::boost::details::compressed_pair_switch<
                     T1,
@@ -382,7 +382,7 @@ public:
 // Partial specialisation for case where T1 == T2:
 //
 template <class T>
-class compressed_pair<T, T>
+class BOOST_EMPTYBASES compressed_pair<T, T>
    : private details::compressed_pair_imp<T, T,
              ::boost::details::compressed_pair_switch<
                     T,

@@ -865,7 +865,7 @@ out:
       if (!tmp)
 	  DebugBreak();
 #     if defined(_MSC_VER) && defined(_DEBUG)
-	  _CrtDbgReport(_CRT_WARN, NULL, 0, NULL, "%.*s", len, buf);
+	  _CrtDbgReport(_CRT_WARN, NULL, 0, NULL, "%.*s", (int)len, buf);
 #     endif
       if (GC_need_to_lock) LeaveCriticalSection(&GC_write_cs);
       return tmp ? (int)written : -1;

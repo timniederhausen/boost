@@ -65,10 +65,10 @@
 #endif
 // workaroud: MSVC 14 does not provide macros to test for compile-time integer sequence
 #if _MSC_VER > 1800 // _MSC_VER == 1800 -> MS Visual Studio 2013
-# undef BOOST_CONTEXT_NO_INDEX_SEQUENCE
+# undef BOOST_CONTEXT_NO_CXX14_INTEGER_SEQUENCE
 #endif
 // workaround: Xcode clang feature detection
-#if ! defined(__cpp_lib_integer_sequence) && __cpp_lib_integer_sequence >= 201304
+#if ! defined(__cpp_lib_integer_sequence) && defined(_LIBCPP_STD_VER)
 # if _LIBCPP_STD_VER > 11
 #  undef BOOST_CONTEXT_NO_CXX14_INTEGER_SEQUENCE
 # endif

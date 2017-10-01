@@ -602,6 +602,14 @@ namespace std{ using ::type_info; }
 #  endif
 #endif
 
+// BOOST_MAY_ALIAS -----------------------------------------------//
+// The macro expands to an attribute to mark a type that is allowed to alias other types.
+// The macro is defined in the compiler-specific headers.
+#if !defined(BOOST_MAY_ALIAS)
+#  define BOOST_NO_MAY_ALIAS
+#  define BOOST_MAY_ALIAS
+#endif
+
 // BOOST_FORCEINLINE ---------------------------------------------//
 // Macro to use in place of 'inline' to force a function to be inline
 #if !defined(BOOST_FORCEINLINE)
@@ -1023,6 +1031,12 @@ namespace std{ using ::type_info; }
 //
 #if defined(BOOST_NO_CXX11_VARIADIC_TEMPLATES) && !defined(BOOST_NO_CXX11_FIXED_LENGTH_VARIADIC_TEMPLATE_EXPANSION_PACKS)
 #  define BOOST_NO_CXX11_FIXED_LENGTH_VARIADIC_TEMPLATE_EXPANSION_PACKS
+#endif
+
+#if defined(BOOST_MSVC) && BOOST_MSVC_FULL_VER >= 190023918
+#  define BOOST_EMPTYBASES __declspec(empty_bases)
+#else
+#  define BOOST_EMPTYBASES
 #endif
 
 //

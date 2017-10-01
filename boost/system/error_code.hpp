@@ -618,19 +618,19 @@ namespace boost
 
     //  error_category default implementation  -----------------------------------------//
 
-    error_condition error_category::default_error_condition( int ev ) const
+    inline error_condition error_category::default_error_condition( int ev ) const
       BOOST_SYSTEM_NOEXCEPT
     {
       return error_condition( ev, *this );
     }
 
-    bool error_category::equivalent( int code,
+    inline bool error_category::equivalent( int code,
       const error_condition & condition ) const BOOST_SYSTEM_NOEXCEPT
     {
       return default_error_condition( code ) == condition;
     }
 
-    bool error_category::equivalent( const error_code & code,
+    inline bool error_category::equivalent( const error_code & code,
       int condition ) const BOOST_SYSTEM_NOEXCEPT
     {
       return *this == code.category() && code.value() == condition;

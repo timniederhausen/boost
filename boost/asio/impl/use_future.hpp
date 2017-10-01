@@ -16,6 +16,7 @@
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
 #include <boost/asio/detail/config.hpp>
+#include <exception>
 #include <future>
 #include <boost/asio/async_result.hpp>
 #include <boost/system/error_code.hpp>
@@ -46,7 +47,7 @@ namespace detail {
 
     void operator()(T t)
     {
-      promise_->set_value(t);
+      promise_->set_value(BOOST_ASIO_MOVE_CAST(T)(t));
     }
 
     void operator()(const boost::system::error_code& ec, T t)
@@ -56,7 +57,7 @@ namespace detail {
             std::make_exception_ptr(
               boost::system::system_error(ec)));
       else
-        promise_->set_value(t);
+        promise_->set_value(BOOST_ASIO_MOVE_CAST(T)(t));
     }
 
   //private:
@@ -128,12 +129,12 @@ public:
   // Constructor creates a new promise for the async operation, and obtains the
   // corresponding future.
   explicit async_result(detail::promise_handler<T>& h)
+    : value_(h.promise_->get_future())
   {
-    value_ = h.promise_->get_future();
   }
 
   // Obtain the future to be returned from the initiating function.
-  type get() { return std::move(value_); }
+  type get() { return BOOST_ASIO_MOVE_CAST(type)(value_); }
 
 private:
   type value_;

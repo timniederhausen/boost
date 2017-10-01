@@ -17,7 +17,6 @@
 #define BOOST_FUNCTIONAL_HASH_HASH_HPP
 
 #include <boost/functional/hash/hash_fwd.hpp>
-#include <functional>
 #include <boost/functional/hash/detail/hash_float.hpp>
 #include <string>
 #include <boost/limits.hpp>
@@ -62,17 +61,12 @@ namespace boost
 {
     namespace hash_detail
     {
-#if defined(_HAS_AUTO_PTR_ETC) && !_HAS_AUTO_PTR_ETC
         template <typename T>
         struct hash_base
         {
             typedef T argument_type;
             typedef std::size_t result_type;
         };
-#else
-        template <typename T>
-        struct hash_base : std::unary_function<T, std::size_t> {};
-#endif
 
         struct enable_hash_value { typedef std::size_t type; };
 
@@ -440,7 +434,7 @@ namespace boost
     // These are undefined later.
 
 #define BOOST_HASH_SPECIALIZE(type) \
-    template <> struct hash<type> \
+    template <> struct BOOST_EMPTYBASES hash<type> \
          : public boost::hash_detail::hash_base<type> \
     { \
         std::size_t operator()(type v) const \
@@ -450,7 +444,7 @@ namespace boost
     };
 
 #define BOOST_HASH_SPECIALIZE_REF(type) \
-    template <> struct hash<type> \
+    template <> struct BOOST_EMPTYBASES hash<type> \
          : public boost::hash_detail::hash_base<type> \
     { \
         std::size_t operator()(type const& v) const \
@@ -516,7 +510,7 @@ namespace boost
 #if !defined(BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION)
 
     template <class T>
-    struct hash<T*>
+    struct BOOST_EMPTYBASES hash<T*>
         : public boost::hash_detail::hash_base<T*>
     {
         std::size_t operator()(T* v) const
@@ -549,7 +543,7 @@ namespace boost
         struct hash_impl<true>
         {
             template <class T>
-            struct inner
+            struct BOOST_EMPTYBASES inner
                 : public boost::hash_detail::hash_base<T>
             {
                 std::size_t operator()(T val) const
@@ -567,7 +561,7 @@ namespace boost
         };
     }
 
-    template <class T> struct hash
+    template <class T> struct BOOST_EMPTYBASES hash
         : public boost::hash_detail::hash_impl<boost::is_pointer<T>::value>
             ::BOOST_NESTED_TEMPLATE inner<T>
     {

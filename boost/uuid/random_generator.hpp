@@ -10,7 +10,7 @@
 
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/seed_rng.hpp>
-#include <boost/random/uniform_int.hpp>
+#include <boost/random/uniform_int_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/core/null_deleter.hpp>
@@ -25,7 +25,7 @@ namespace uuids {
 template <typename UniformRandomNumberGenerator>
 class basic_random_generator {
 private:
-    typedef uniform_int<unsigned long> distribution_type;
+    typedef random::uniform_int_distribution<unsigned long> distribution_type;
     typedef variate_generator<UniformRandomNumberGenerator*, distribution_type> generator_type;
 
 public:
@@ -36,10 +36,7 @@ public:
         : pURNG(new UniformRandomNumberGenerator)
         , generator
           ( pURNG.get()
-          , distribution_type
-            ( (std::numeric_limits<unsigned long>::min)()
-            , (std::numeric_limits<unsigned long>::max)()
-            )
+          , distribution_type()
           )
     {
         // seed the random number generator
@@ -52,10 +49,7 @@ public:
         : pURNG(&gen, boost::null_deleter())
         , generator
           ( pURNG.get()
-          , distribution_type
-            ( (std::numeric_limits<unsigned long>::min)()
-            , (std::numeric_limits<unsigned long>::max)()
-            )
+          , distribution_type()
           )
     {}
 
@@ -65,10 +59,7 @@ public:
         : pURNG(pGen, boost::null_deleter())
         , generator
           ( pURNG.get()
-          , distribution_type
-            ( (std::numeric_limits<unsigned long>::min)()
-            , (std::numeric_limits<unsigned long>::max)()
-            )
+          , distribution_type()
           )
     {
         BOOST_ASSERT(pURNG);
