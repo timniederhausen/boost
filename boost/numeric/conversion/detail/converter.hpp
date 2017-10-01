@@ -10,11 +10,11 @@
 #ifndef BOOST_NUMERIC_CONVERSION_DETAIL_CONVERTER_FLC_12NOV2002_HPP
 #define BOOST_NUMERIC_CONVERSION_DETAIL_CONVERTER_FLC_12NOV2002_HPP
 
-#include <functional>
-
 #include "boost/numeric/conversion/detail/meta.hpp"
 #include "boost/numeric/conversion/detail/conversion_traits.hpp"
 #include "boost/numeric/conversion/bounds.hpp"
+
+#include "boost/limits.hpp"
 
 #include "boost/type_traits/is_same.hpp"
 

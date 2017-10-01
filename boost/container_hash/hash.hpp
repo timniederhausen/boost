@@ -577,7 +577,7 @@ namespace boost
     // These are undefined later.
 
 #define BOOST_HASH_SPECIALIZE(type) \
-    template <> struct hash<type> \
+    template <> struct BOOST_EMPTYBASES hash<type> \
          : public boost::hash_detail::hash_base<type> \
     { \
         std::size_t operator()(type v) const \
@@ -587,7 +587,7 @@ namespace boost
     };
 
 #define BOOST_HASH_SPECIALIZE_REF(type) \
-    template <> struct hash<type> \
+    template <> struct BOOST_EMPTYBASES hash<type> \
          : public boost::hash_detail::hash_base<type> \
     { \
         std::size_t operator()(type const& v) const \
@@ -597,7 +597,7 @@ namespace boost
     };
 
 #define BOOST_HASH_SPECIALIZE_TEMPLATE_REF(type) \
-    struct hash<type> \
+    struct BOOST_EMPTYBASES hash<type> \
          : public boost::hash_detail::hash_base<type> \
     { \
         std::size_t operator()(type const& v) const \
@@ -688,7 +688,7 @@ namespace boost
 #if !defined(BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION)
 
     template <class T>
-    struct hash<T*>
+    struct BOOST_EMPTYBASES hash<T*>
         : public boost::hash_detail::hash_base<T*>
     {
         std::size_t operator()(T* v) const
@@ -721,7 +721,7 @@ namespace boost
         struct hash_impl<true>
         {
             template <class T>
-            struct inner
+            struct BOOST_EMPTYBASES inner
                 : public boost::hash_detail::hash_base<T>
             {
                 std::size_t operator()(T val) const
@@ -739,7 +739,7 @@ namespace boost
         };
     }
 
-    template <class T> struct hash
+    template <class T> struct BOOST_EMPTYBASES hash
         : public boost::hash_detail::hash_impl<boost::is_pointer<T>::value>
             ::BOOST_NESTED_TEMPLATE inner<T>
     {
