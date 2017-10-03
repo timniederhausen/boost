@@ -29,7 +29,7 @@
 #  error BOOST_POSIX_API or BOOST_WINDOWS_API must be defined
 #endif
 
-#ifndef BOOST_NO_CXX11_HDR_SYSTEM_ERROR
+#if !defined(BOOST_NO_CXX11_HDR_SYSTEM_ERROR) && !defined(BOOST_ERROR_CODE_NO_STD)
 #include <system_error>
 #endif
 
@@ -221,6 +221,7 @@ namespace boost
 
     class error_category : public noncopyable
     {
+#ifndef BOOST_ERROR_CODE_NO_STD
 #ifndef BOOST_NO_CXX11_HDR_SYSTEM_ERROR
 
     private:
@@ -233,7 +234,8 @@ namespace boost
 
       public:
 
-        explicit std_category( boost::system::error_category const * pc ): pc_( pc )
+        explicit std_category( boost::system::error_category const * pc ) BOOST_NOEXCEPT
+          : pc_( pc )
         {
         }
 
@@ -284,7 +286,8 @@ namespace boost
 
       public:
 
-        explicit std_category( boost::system::error_category const * pc ): pc_( pc )
+        BOOST_CONSTEXPR explicit std_category( boost::system::error_category const * pc ) BOOST_NOEXCEPT
+          : pc_( pc )
         {
         }
 
@@ -313,16 +316,29 @@ namespace boost
       error_category() BOOST_SYSTEM_NOEXCEPT: std_cat_( this ) {}
 
 #endif
+#else
+    public:
+
+#if !defined(BOOST_NO_CXX11_DEFAULTED_FUNCTIONS)
+      BOOST_CONSTEXPR error_category() BOOST_SYSTEM_NOEXCEPT = default;
+#else
+      BOOST_CONSTEXPR error_category() BOOST_SYSTEM_NOEXCEPT {}
+#endif
+#endif
 
     public:
+#if !defined(BOOST_NO_CXX11_DEFAULTED_FUNCTIONS)
+      virtual ~error_category() = default;
+#else
       virtual ~error_category(){}
+#endif
 
       virtual const char *     name() const BOOST_SYSTEM_NOEXCEPT = 0;
       virtual std::string      message( int ev ) const = 0;
-      inline virtual error_condition  default_error_condition( int ev ) const 
+      inline virtual error_condition  default_error_condition( int ev ) const
         BOOST_SYSTEM_NOEXCEPT;
       inline virtual bool             equivalent( int code,
-                                           const error_condition & condition ) const 
+                                           const error_condition & condition ) const
         BOOST_SYSTEM_NOEXCEPT;
       inline virtual bool             equivalent( const error_code & code,
                                            int condition ) const  BOOST_SYSTEM_NOEXCEPT;
@@ -430,7 +446,7 @@ namespace boost
           || (lhs.m_cat == rhs.m_cat && lhs.m_val < rhs.m_val);
       }
 
-#ifndef BOOST_NO_CXX11_HDR_SYSTEM_ERROR
+#if !defined(BOOST_NO_CXX11_HDR_SYSTEM_ERROR) && !defined(BOOST_ERROR_CODE_NO_STD)
 
       operator std::error_condition () const BOOST_SYSTEM_NOEXCEPT
       {
@@ -540,7 +556,7 @@ namespace boost
           || (lhs.m_cat == rhs.m_cat && lhs.m_val < rhs.m_val);
       }
 
-#ifndef BOOST_NO_CXX11_HDR_SYSTEM_ERROR
+#if !defined(BOOST_NO_CXX11_HDR_SYSTEM_ERROR) && !defined(BOOST_ERROR_CODE_NO_STD)
 
       operator std::error_code () const BOOST_SYSTEM_NOEXCEPT
       {
@@ -683,7 +699,7 @@ namespace boost
       return *this == code.category() && code.value() == condition;
     }
 
-#ifndef BOOST_NO_CXX11_HDR_SYSTEM_ERROR
+#if !defined(BOOST_NO_CXX11_HDR_SYSTEM_ERROR) && !defined(BOOST_ERROR_CODE_NO_STD)
 
     inline std::error_condition error_category::std_category::default_error_condition(
       int ev ) const BOOST_NOEXCEPT
