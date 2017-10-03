@@ -485,8 +485,8 @@ namespace
     defined(BOOST_ERROR_CODE_GLOBAL)
 namespace
 {
-  static const system_error_category system_category_const;
-  static const generic_error_category generic_category_const;
+  static const system_error_category system_category_const{};
+  static const generic_error_category generic_category_const{};
 }
     BOOST_SYSTEM_LINKAGE const error_category & system_category() BOOST_SYSTEM_NOEXCEPT
     { return system_category_const; }
@@ -496,13 +496,13 @@ namespace
 #else
     BOOST_SYSTEM_LINKAGE const error_category & system_category() BOOST_SYSTEM_NOEXCEPT
     {
-      static const system_error_category  system_category_const;
+      static const system_error_category system_category_const{};
       return system_category_const;
     }
 
     BOOST_SYSTEM_LINKAGE const error_category & generic_category() BOOST_SYSTEM_NOEXCEPT
     {
-      static const generic_error_category generic_category_const;
+      static const generic_error_category generic_category_const{};
       return generic_category_const;
     }
 #endif
