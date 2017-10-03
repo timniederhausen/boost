@@ -2,11 +2,22 @@ declare_args() {
   # Keep/remove deprecated declarations.
   # Sets the BOOST_SYSTEM_NO_DEPRECATED define.
   boost_system_no_deprecate = true
+
+  # Control interoperability with std::error_code
+  boost_system_no_std_error_code = false
+
+  # Use global static variables for
+  # error_category objects.
+  boost_system_global_error_categories = false
 }
 
 config("system_config") {
+  defines = []
   if (boost_system_no_deprecate) {
-    defines = [ "BOOST_SYSTEM_NO_DEPRECATED" ]
+    defines += [ "BOOST_SYSTEM_NO_DEPRECATED" ]
+  }
+  if (boost_system_no_std_error_code) {
+    defines += [ "BOOST_ERROR_CODE_NO_STD" ]
   }
 }
 
@@ -14,6 +25,10 @@ source_set("system") {
   sources = [
     "src/error_code.cpp",
   ]
+
+  if (boost_system_global_error_categories) {
+    defines = [ "BOOST_ERROR_CODE_GLOBAL" ]
+  }
 
   public_configs = [
     ":system_config",
