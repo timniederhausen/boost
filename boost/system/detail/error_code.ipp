@@ -52,7 +52,11 @@ namespace
   class generic_error_category : public error_category
   {
   public:
-    generic_error_category(){}
+#if !defined(BOOST_NO_CXX11_DEFAULTED_FUNCTIONS)
+    BOOST_CONSTEXPR generic_error_category() = default;
+#else
+    BOOST_CONSTEXPR generic_error_category(){}
+#endif
     const char *   name() const BOOST_SYSTEM_NOEXCEPT;
     std::string    message( int ev ) const;
   };
@@ -60,7 +64,11 @@ namespace
   class system_error_category : public error_category
   {
   public:
-    system_error_category(){}
+#if !defined(BOOST_NO_CXX11_DEFAULTED_FUNCTIONS)
+    BOOST_CONSTEXPR system_error_category() = default;
+#else
+    BOOST_CONSTEXPR system_error_category(){}
+#endif
     const char *        name() const BOOST_SYSTEM_NOEXCEPT;
     std::string         message( int ev ) const;
     error_condition     default_error_condition( int ev ) const BOOST_SYSTEM_NOEXCEPT;
@@ -473,6 +481,19 @@ namespace
 #   define BOOST_SYSTEM_LINKAGE BOOST_SYSTEM_DECL
 # endif
 
+#if !defined(BOOST_ERROR_CODE_HEADER_ONLY) && !defined(BOOST_NO_CXX11_CONSTEXPR) && \
+    defined(BOOST_ERROR_CODE_GLOBAL)
+namespace
+{
+  static const system_error_category system_category_const;
+  static const generic_error_category generic_category_const;
+}
+    BOOST_SYSTEM_LINKAGE const error_category & system_category() BOOST_SYSTEM_NOEXCEPT
+    { return system_category_const; }
+
+    BOOST_SYSTEM_LINKAGE const error_category & generic_category() BOOST_SYSTEM_NOEXCEPT
+    { return generic_category_const; }
+#else
     BOOST_SYSTEM_LINKAGE const error_category & system_category() BOOST_SYSTEM_NOEXCEPT
     {
       static const system_error_category  system_category_const;
@@ -484,7 +505,7 @@ namespace
       static const generic_error_category generic_category_const;
       return generic_category_const;
     }
-
+#endif
   } // namespace system
 } // namespace boost
 
