@@ -18,6 +18,7 @@
 #include <string.h>
 #include <limits.h>
 #include <signal.h>
+#include <ctype.h>
 
 #ifdef NT
 #include <windows.h>
@@ -26,6 +27,7 @@
 #else
 #include <errno.h>
 #include <sys/wait.h>
+#include <unistd.h>
 #endif
 
 #undef debug_on_enter_function
@@ -399,7 +401,7 @@ static void debug_print_frame( FRAME * frame )
     printf( "%s ", frame->rulename );
     if ( strcmp( frame->rulename, "module scope" ) != 0 )
     {
-        printf( "( ", frame->rulename );
+        printf( "( " );
         if ( frame->args->count )
         {
             lol_print( frame->args );
@@ -428,7 +430,7 @@ static void debug_print_frame_info( FRAME_INFO * frame )
     printf( "%s ", frame->rulename );
     if ( strcmp( frame->rulename, "module scope" ) != 0 )
     {
-        printf( "( ", frame->rulename );
+        printf( "( " );
         if ( frame->args->count )
         {
             lol_print( frame->args );
@@ -833,8 +835,16 @@ static const char * debug_format_message( const char * format, va_list vargs )
         buf = malloc( sz );
         if ( !buf )
             return 0;
+        #ifndef va_copy
+        args = vargs;
+        #else
         va_copy( args, vargs );
+        #endif
+        #if defined(_MSC_VER) && (_MSC_VER <= 1310)
+        result = _vsnprintf( buf, sz, format, args );
+        #else
         result = vsnprintf( buf, sz, format, args );
+        #endif
         va_end( args );
         if ( result < 0 )
             return 0;
@@ -1125,10 +1135,13 @@ static void debug_start_child( int argc, const char * * argv )
     sprintf( buf, "%p", pipe2[ 1 ] );
     string_append( command_line, buf );
     /* Pass the rest of the command line. */
-    for ( int i = 1; i < argc; ++i )
-    {
-        string_push_back( command_line, ' ' );
-        string_append( command_line, argv[ i ] );
+	{
+        int i;
+        for ( i = 1; i < argc; ++i )
+        {
+            string_push_back( command_line, ' ' );
+            string_append( command_line, argv[ i ] );
+        }
     }
     SetHandleInformation( pipe1[ 1 ], HANDLE_FLAG_INHERIT, 0 );
     SetHandleInformation( pipe2[ 0 ], HANDLE_FLAG_INHERIT, 0 );
@@ -2064,7 +2077,7 @@ static void debug_mi_break_list( int argc, const char * * argv )
     int number;
     int i;
     int first;
-    if ( argc > 2 || argc == 2 && strcmp( argv[ 1 ], "--" ) )
+    if ( argc > 2 || ( argc == 2 && strcmp( argv[ 1 ], "--" ) ) )
     {
         debug_mi_error( "Too many arguments for -break-list" );
         return;

@@ -1735,28 +1735,6 @@ fkbf.get_date(date(2002,Feb,1));
 <header name="boost/date_time/filetime_functions.hpp">
 <para>Function(s) for converting between a FILETIME structure and a time object. This file is only available on systems that have BOOST_HAS_FTIME defined. </para><namespace name="boost">
 <namespace name="date_time">
-<namespace name="winapi">
-<struct name="FILETIME"><data-member name="dwLowDateTime"><type>boost::uint32_t</type></data-member>
-<data-member name="dwHighDateTime"><type>boost::uint32_t</type></data-member>
-</struct><struct name="SYSTEMTIME"><data-member name="wYear"><type>boost::uint16_t</type></data-member>
-<data-member name="wMonth"><type>boost::uint16_t</type></data-member>
-<data-member name="wDayOfWeek"><type>boost::uint16_t</type></data-member>
-<data-member name="wDay"><type>boost::uint16_t</type></data-member>
-<data-member name="wHour"><type>boost::uint16_t</type></data-member>
-<data-member name="wMinute"><type>boost::uint16_t</type></data-member>
-<data-member name="wSecond"><type>boost::uint16_t</type></data-member>
-<data-member name="wMilliseconds"><type>boost::uint16_t</type></data-member>
-</struct><typedef name="file_time"><type><classname>FILETIME</classname></type></typedef>
-<typedef name="system_time"><type><classname>SYSTEMTIME</classname></type></typedef>
-<data-member name="lpLocalFileTime"><type><classname>FILETIME</classname> *</type></data-member>
-<data-member name="lpFileTime"><type><classname>FILETIME</classname> *</type></data-member>
-<function name="__declspec"><type/><parameter name=""><paramtype>dllimport</paramtype></parameter></function>
-<function name="get_system_time_as_file_time"><type>void</type><parameter name="ft"><paramtype><classname>file_time</classname> &amp;</paramtype></parameter></function>
-<function name="file_time_to_microseconds"><type>boost::uint64_t</type><template>
-          <template-type-parameter name="FileTimeT"/>
-        </template><parameter name="ft"><paramtype>FileTimeT const &amp;</paramtype></parameter><description><para>The function converts file_time into number of microseconds elapsed since 1970-Jan-01</para><para><note><para>Only dates after 1970-Jan-01 are supported. Dates before will be wrapped.</para><para>The function is templated on the <classname alt="boost::date_time::winapi::FILETIME">FILETIME</classname> type, so that it can be used with both native <classname alt="boost::date_time::winapi::FILETIME">FILETIME</classname> and the ad-hoc boost::date_time::winapi::file_time type. </para></note>
-</para></description></function>
-</namespace>
 
 
 
@@ -1777,7 +1755,7 @@ fkbf.get_date(date(2002,Feb,1));
 <function name="time_from_ftime"><type>TimeT</type><template>
           <template-type-parameter name="TimeT"/>
           <template-type-parameter name="FileTimeT"/>
-        </template><parameter name="ft"><paramtype>const FileTimeT &amp;</paramtype></parameter><purpose>Create a time object from an initialized FILETIME struct. </purpose><description><para>Create a time object from an initialized FILETIME struct. A FILETIME struct holds 100-nanosecond units (0.0000001). When built with microsecond resolution the file_time's sub second value will be truncated. Nanosecond resolution has no truncation.</para><para><note><para>The function is templated on the FILETIME type, so that it can be used with both native FILETIME and the ad-hoc boost::date_time::winapi::file_time type. </para></note>
+        </template><parameter name="ft"><paramtype>const FileTimeT &amp;</paramtype></parameter><purpose>Create a time object from an initialized FILETIME struct. </purpose><description><para>Create a time object from an initialized FILETIME struct. A FILETIME struct holds 100-nanosecond units (0.0000001). When built with microsecond resolution the file_time's sub second value will be truncated. Nanosecond resolution has no truncation.</para><para><note><para>The function is templated on the FILETIME type, so that it can be used with both native FILETIME and the ad-hoc boost::detail::winapi::FILETIME_ type. </para></note>
 </para></description></function>
 
 
@@ -2376,6 +2354,8 @@ if (us_dst::local_is_dst(t.date(), t.time_of_day())
 </method-group>
 <method-group name="private static functions">
 <method name="create_time" specifiers="static"><type>time_type</type><parameter name="converter"><paramtype>time_converter</paramtype></parameter></method>
+<method name="file_time_to_microseconds" specifiers="static"><type>boost::uint64_t</type><parameter name="ft"><paramtype>boost::winapi::FILETIME_ const &amp;</paramtype></parameter><description><para>The function converts file_time into number of microseconds elapsed since 1970-Jan-01</para><para><note><para>Only dates after 1970-Jan-01 are supported. Dates before will be wrapped. </para></note>
+</para></description></method>
 </method-group>
 </class>
 

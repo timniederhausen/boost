@@ -10,6 +10,10 @@
 # bring in rules for testing
 import testing ;
 
+# quick test (for CI)
+run quick.cpp ;
+
+# full test suite
 run smart_ptr_test.cpp ;
 run shared_ptr_basic_test.cpp : : : <toolset>gcc:<cxxflags>-Wno-non-virtual-dtor ;
 run shared_ptr_test.cpp : : : <toolset>gcc:<cxxflags>-Wno-non-virtual-dtor ;
@@ -22,6 +26,7 @@ run intrusive_ptr_move_test.cpp ;
 run intrusive_ref_counter_test.cpp ;
 run atomic_count_test.cpp ;
 run lw_mutex_test.cpp ;
+run lw_mutex_test.cpp : : : <define>BOOST_USE_WINDOWS_H : lw_mutex_test.win_h ;
 compile-fail shared_ptr_assign_fail.cpp ;
 compile-fail shared_ptr_delete_fail.cpp ;
 compile-fail shared_ptr_compare_fail.cpp ;
@@ -259,3 +264,5 @@ run allocate_local_shared_array_construct_test.cpp ;
 run local_sp_fn_test.cpp ;
 run lsp_convertible_test.cpp ;
 run lsp_convertible_test2.cpp ;
+
+run make_shared_array_tmp_test.cpp ;

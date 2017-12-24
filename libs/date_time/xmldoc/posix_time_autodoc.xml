@@ -52,7 +52,7 @@
 <function name="from_ftime"><type>TimeT</type><template>
           <template-type-parameter name="TimeT"/>
           <template-type-parameter name="FileTimeT"/>
-        </template><parameter name="ft"><paramtype>const FileTimeT &amp;</paramtype></parameter><purpose>Function to create a time object from an initialized FILETIME struct. </purpose><description><para>Function to create a time object from an initialized FILETIME struct. A FILETIME struct holds 100-nanosecond units (0.0000001). When built with microsecond resolution the FILETIME's sub second value will be truncated. Nanosecond resolution has no truncation.</para><para><note><para>FILETIME is part of the Win32 API, so it is not portable to non-windows platforms.</para><para>The function is templated on the FILETIME type, so that it can be used with both native FILETIME and the ad-hoc boost::date_time::winapi::file_time type. </para></note>
+        </template><parameter name="ft"><paramtype>const FileTimeT &amp;</paramtype></parameter><purpose>Function to create a time object from an initialized FILETIME struct. </purpose><description><para>Function to create a time object from an initialized FILETIME struct. A FILETIME struct holds 100-nanosecond units (0.0000001). When built with microsecond resolution the FILETIME's sub second value will be truncated. Nanosecond resolution has no truncation.</para><para><note><para>FILETIME is part of the Win32 API, so it is not portable to non-windows platforms.</para><para>The function is templated on the FILETIME type, so that it can be used with both native FILETIME and the ad-hoc boost::detail::winapi::FILETIME_ type. </para></note>
 </para></description></function>
 </namespace>
 </namespace>
