@@ -1,4 +1,4 @@
-source_set("container") {
+static_library("container") {
   sources = [
     "src/alloc_lib.c",
     "src/dlmalloc.cpp",
