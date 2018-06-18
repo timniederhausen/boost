@@ -1,4 +1,4 @@
-source_set("program_options") {
+static_library("program_options") {
   sources = [
     "src/cmdline.cpp",
     "src/config_file.cpp",
