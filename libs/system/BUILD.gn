@@ -10,7 +10,7 @@ config("system_config") {
   }
 }
 
-source_set("system") {
+static_library("system") {
   sources = [
     "src/error_code.cpp",
   ]
