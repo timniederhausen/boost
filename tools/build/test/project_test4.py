@@ -16,13 +16,13 @@ t.run_build_system()
 
 t.expect_addition("bin/$toolset/debug*/a.obj")
 t.expect_content("bin/$toolset/debug*/a.obj",
-"""$toolset/debug*/include-everything
+"""$toolset/debug*/include-everything*
 a.cpp
 """)
 
 t.expect_addition("bin/$toolset/debug*/a.exe")
 t.expect_content("bin/$toolset/debug*/a.exe",
-"$toolset/debug*/include-everything\n" +
+"$toolset/debug*/include-everything*\n" +
 "bin/$toolset/debug*/a.obj lib/bin/$toolset/debug/optimization-speed*/b.obj\n"
 )
 
@@ -43,7 +43,7 @@ t.copy("lib/jamfile3.jam", "lib/jamfile.jam")
 # Link-compatibility check for rtti is disabled...
 #t.run_build_system(status=None)
 #import string
-#t.fail_test(string.find(t.stdout(),
+#t.fail_test(t.stdout().find(
 #"""warning: targets produced from b.obj are link incompatible
 #warning: with main target a.exe""") !=-0)
 

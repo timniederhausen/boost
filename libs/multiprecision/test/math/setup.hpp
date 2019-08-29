@@ -1,6 +1,6 @@
 //  Copyright 2013 John Maddock. Distributed under the Boost
 //  Software License, Version 1.0. (See accompanying file
-//  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_
+//  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
 
 #ifndef BOOST_MP_MATH_SETUP_HPP
 #define BOOST_MP_MATH_SETUP_HPP
@@ -97,11 +97,11 @@ typedef boost::multiprecision::mpfr_float test_type_4;
 
 #define CPP_DEC_FLOAT_TESTS    test(number<cpp_dec_float<18> >(), "number<cpp_dec_float<18> >");\
    test(number<cpp_dec_float<30> >(), "number<cpp_dec_float<30> >");\
-   test(number<cpp_dec_float<35, long long, std::allocator<void> > >(), "number<cpp_dec_float<35, long long, std::allocator<void> > >");
+   test(number<cpp_dec_float<35, long long, std::allocator<char> > >(), "number<cpp_dec_float<35, long long, std::allocator<char> > >");
 
 typedef boost::multiprecision::number<boost::multiprecision::cpp_dec_float<18> > test_type_1;
 typedef boost::multiprecision::number<boost::multiprecision::cpp_dec_float<30> > test_type_2;
-typedef boost::multiprecision::number<boost::multiprecision::cpp_dec_float<35, long long, std::allocator<void> > > test_type_3;
+typedef boost::multiprecision::number<boost::multiprecision::cpp_dec_float<35, long long, std::allocator<char> > > test_type_3;
 
 #else
 

@@ -2,9 +2,10 @@
 // Unit Test
 
 // Copyright (c) 2016 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2017 Adam Wulkiewicz, Lodz, Poland.
 
-// This file was modified by Oracle on 2017.
-// Modifications copyright (c) 2017, Oracle and/or its affiliates.
+// This file was modified by Oracle on 2017, 2019.
+// Modifications copyright (c) 2017, 2019, Oracle and/or its affiliates.
 // Contributed and/or modified by Adam Wulkiewicz, on behalf of Oracle
 
 // Use, modification and distribution is subject to the Boost Software License,
@@ -46,13 +47,13 @@ template
 <
     bool Reverse1, bool Reverse2,
     bg::overlay_type OverlayType,
-    typename Turns,
     typename Clusters,
+    typename Turns,
     typename Geometry1,
     typename Geometry2,
     typename SideStrategy
 >
-std::vector<std::size_t> test_gather_cluster_properties(std::string const& case_id,
+std::vector<std::size_t> gather_cluster_properties(
         Clusters& clusters, Turns& turns,
         bg::detail::overlay::operation_type for_operation,
         Geometry1 const& geometry1, Geometry2 const& geometry2,
@@ -125,7 +126,7 @@ template
     typename Geometry1, typename Geometry2,
     typename RobustPolicy, typename Strategy
 >
-std::vector<std::size_t> apply_overlay(std::string const& case_id,
+std::vector<std::size_t> apply_overlay(
             Geometry1 const& geometry1, Geometry2 const& geometry2,
             RobustPolicy const& robust_policy,
             Strategy const& strategy)
@@ -156,16 +157,13 @@ std::vector<std::size_t> apply_overlay(std::string const& case_id,
             detail::overlay::assign_null_policy
         >(geometry1, geometry2, strategy, robust_policy, turns, policy);
 
-    typename Strategy::side_strategy_type side_strategy;
     cluster_type clusters;
 
     bg::enrich_intersection_points<Reverse1, Reverse2, OverlayType>(turns,
-            clusters, geometry1, geometry2,
-                robust_policy,
-                side_strategy);
+            clusters, geometry1, geometry2, robust_policy, strategy);
 
     // Gather cluster properties, with test option
-    return test_gather_cluster_properties<Reverse1, Reverse2, OverlayType>(case_id,
+    return ::gather_cluster_properties<Reverse1, Reverse2, OverlayType>(
             clusters, turns, bg::detail::overlay::operation_from_overlay<OverlayType>::value,
                 geometry1, geometry2, strategy.get_side_strategy());
 }
@@ -206,8 +204,10 @@ void test_sort_by_side(std::string const& case_id,
 
     strategy_type strategy;
 
-    std::vector<std::size_t> result = apply_overlay<OverlayType, false, false, false, geometry_out>(case_id, g1, g2,
-                    robust_policy, strategy);
+    std::vector<std::size_t> result = ::apply_overlay
+                                        <
+                                            OverlayType, false, false, false, geometry_out
+                                        >(g1, g2, robust_policy, strategy);
 
     BOOST_CHECK_MESSAGE(result == expected_open_count,
                         "  caseid="  << case_id

@@ -11,6 +11,7 @@
 
 #include <iostream>
 #include "test.hpp"
+#include "utils.hpp"
 
 struct adata
 {
@@ -34,6 +35,10 @@ struct test_attribute_type
 int
 main()
 {
+    using boost::spirit::x3::traits::is_optional;
+
+    static_assert(is_optional<boost::optional<int>>(), "is_optional problem");
+
     using spirit_test::test;
     using spirit_test::test_attr;
 
@@ -96,6 +101,12 @@ main()
         BOOST_TEST(2 == v.size() &&
             1 == v[0].a && v[0].b && 2 == *(v[0].b) &&
             2 == v[1].a && !v[1].b);
+    }
+
+    { // test move only types
+        boost::optional<move_only> o;
+        BOOST_TEST(test_attr("s", -synth_move_only, o));
+        BOOST_TEST(o);
     }
 
     return boost::report_errors();

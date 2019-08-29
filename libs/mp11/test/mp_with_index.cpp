@@ -8,9 +8,8 @@
 
 
 #include <boost/mp11/algorithm.hpp>
+#include <boost/mp11/detail/config.hpp>
 #include <boost/core/lightweight_test.hpp>
-#include <boost/config.hpp>
-#include <boost/detail/workaround.hpp>
 #include <tuple>
 
 using boost::mp11::mp_size_t;
@@ -20,9 +19,9 @@ using boost::mp11::mp_iota_c;
 
 struct F
 {
-    int i_;
+    std::size_t i_;
 
-    explicit F( int i ): i_( i ) {}
+    explicit F( std::size_t i ): i_( i ) {}
 
     template<std::size_t I> bool operator()( mp_size_t<I> ) const
     {
@@ -49,7 +48,7 @@ struct G
 
 int main()
 {
-#if BOOST_WORKAROUND( BOOST_MSVC, < 1900 )
+#if BOOST_MP11_WORKAROUND( BOOST_MP11_MSVC, < 1900 )
 
     G()( mp_size_t<1>{} );
     G()( mp_size_t<2>{} );

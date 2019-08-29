@@ -8,8 +8,36 @@
 #
 
 cmake_minimum_required (VERSION 3.5.1)
+cmake_policy (SET CMP0074 NEW)
 
-project (Beast VERSION 144)
+#-------------------------------------------------------------------------------
+
+function (DoGroupSources curdir rootdir folder)
+    file (GLOB children RELATIVE ${PROJECT_SOURCE_DIR}/${curdir} ${PROJECT_SOURCE_DIR}/${curdir}/*)
+    foreach (child ${children})
+        if (IS_DIRECTORY ${PROJECT_SOURCE_DIR}/${curdir}/${child})
+            DoGroupSources (${curdir}/${child} ${rootdir} ${folder})
+        elseif (${child} STREQUAL "CMakeLists.txt")
+            source_group("" FILES ${PROJECT_SOURCE_DIR}/${curdir}/${child})
+        else()
+            string (REGEX REPLACE ^${rootdir} ${folder} groupname ${curdir})
+            string (REPLACE "/" "\\" groupname ${groupname})
+            source_group (${groupname} FILES ${PROJECT_SOURCE_DIR}/${curdir}/${child})
+        endif()
+    endforeach()
+endfunction()
+
+function (GroupSources curdir folder)
+    DoGroupSources (${curdir} ${curdir} ${folder})
+endfunction()
+
+#-------------------------------------------------------------------------------
+#
+# Beast
+#
+#-------------------------------------------------------------------------------
+
+project (Beast VERSION 266)
 
 set_property (GLOBAL PROPERTY USE_FOLDERS ON)
 option (Beast_BUILD_EXAMPLES "Build examples" ON)
@@ -18,9 +46,13 @@ option (Beast_BUILD_TESTS "Build tests" ON)
 if (MSVC)
     set (CMAKE_VERBOSE_MAKEFILE FALSE)
 
-    add_definitions (-D_WIN32_WINNT=0x0601)
-    add_definitions (-D_SCL_SECURE_NO_WARNINGS=1)
-    add_definitions (-D_CRT_SECURE_NO_WARNINGS=1)
+    add_definitions (
+        -D_WIN32_WINNT=0x0601
+        -D_SCL_SECURE_NO_WARNINGS=1
+        -D_CRT_SECURE_NO_WARNINGS=1
+        -D_SILENCE_CXX17_ALLOCATOR_VOID_DEPRECATION_WARNING
+        -D_SILENCE_CXX17_ADAPTOR_TYPEDEFS_DEPRECATION_WARNING
+    )
 
     add_compile_options(
         /bigobj       # large object file format
@@ -66,8 +98,26 @@ include_directories (include)
 
 #-------------------------------------------------------------------------------
 #
+# OpenSSL
+#
+#-------------------------------------------------------------------------------
+
+if (APPLE AND NOT DEFINED ENV{OPENSSL_ROOT_DIR})
+  find_program(HOMEBREW brew)
+  if (NOT HOMEBREW STREQUAL "HOMEBREW-NOTFOUND")
+    execute_process(COMMAND brew --prefix openssl
+      OUTPUT_VARIABLE OPENSSL_ROOT_DIR
+      OUTPUT_STRIP_TRAILING_WHITESPACE)
+  endif()
+endif()
+
+find_package(OpenSSL)
+
+#-------------------------------------------------------------------------------
+#
 # Boost
 #
+#-------------------------------------------------------------------------------
 
 get_filename_component (BOOST_ROOT ../../ ABSOLUTE)
 
@@ -90,52 +140,6 @@ if (MINGW)
 endif()
 
 #-------------------------------------------------------------------------------
-#
-# OpenSSL
-#
-
-if (APPLE AND NOT DEFINED ENV{OPENSSL_ROOT_DIR})
-  find_program(HOMEBREW brew)
-  if (NOT HOMEBREW STREQUAL "HOMEBREW-NOTFOUND")
-    execute_process(COMMAND brew --prefix openssl
-      OUTPUT_VARIABLE OPENSSL_ROOT_DIR
-      OUTPUT_STRIP_TRAILING_WHITESPACE)
-  endif()
-endif()
-
-find_package(OpenSSL)
-
-if (OPENSSL_FOUND)
-    add_definitions (-DBOOST_BEAST_USE_OPENSSL=1)
-
-else()
-    add_definitions (-DBOOST_BEAST_USE_OPENSSL=0)
-    message("OpenSSL not found.")
-endif()
-
-#
-#-------------------------------------------------------------------------------
-
-function (DoGroupSources curdir rootdir folder)
-    file (GLOB children RELATIVE ${PROJECT_SOURCE_DIR}/${curdir} ${PROJECT_SOURCE_DIR}/${curdir}/*)
-    foreach (child ${children})
-        if (IS_DIRECTORY ${PROJECT_SOURCE_DIR}/${curdir}/${child})
-            DoGroupSources (${curdir}/${child} ${rootdir} ${folder})
-        elseif (${child} STREQUAL "CMakeLists.txt")
-            source_group("" FILES ${PROJECT_SOURCE_DIR}/${curdir}/${child})
-        else()
-            string (REGEX REPLACE ^${rootdir} ${folder} groupname ${curdir})
-            string (REPLACE "/" "\\" groupname ${groupname})
-            source_group (${groupname} FILES ${PROJECT_SOURCE_DIR}/${curdir}/${child})
-        endif()
-    endforeach()
-endfunction()
-
-function (GroupSources curdir folder)
-    DoGroupSources (${curdir} ${curdir} ${folder})
-endfunction()
-
-#-------------------------------------------------------------------------------
 
 if ("${VARIANT}" STREQUAL "coverage")
     if (MSVC)
@@ -150,8 +154,8 @@ elseif ("${VARIANT}" STREQUAL "ubasan")
     else()
         set (CMAKE_BUILD_TYPE RELWITHDEBINFO)
         set (CMAKE_CXX_FLAGS
-          "${CMAKE_CXX_FLAGS} -DBOOST_BEAST_NO_SLOW_TESTS=1 -msse4.2 -funsigned-char -fno-omit-frame-pointer -fsanitize=address,undefined -fsanitize-blacklist=${PROJECT_SOURCE_DIR}/tools/blacklist.supp")
-        set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address,undefined")
+          "${CMAKE_CXX_FLAGS} -DBOOST_BEAST_NO_SLOW_TESTS=1 -msse4.2 -funsigned-char -fno-omit-frame-pointer -fsanitize=address,undefined -fno-sanitize-recover=address,undefined -fsanitize-blacklist=${PROJECT_SOURCE_DIR}/tools/blacklist.supp")
+        set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address,undefined -fno-sanitize-recover=address,undefined")
     endif()
 
 elseif ("${VARIANT}" STREQUAL "debug")
@@ -161,6 +165,40 @@ elseif ("${VARIANT}" STREQUAL "release")
     set (CMAKE_BUILD_TYPE RELEASE)
 
 endif()
+
+#-------------------------------------------------------------------------------
+#
+# Static Libraries
+#
+#-------------------------------------------------------------------------------
+
+add_definitions (-DBOOST_ASIO_SEPARATE_COMPILATION=1)
+add_definitions (-DBOOST_BEAST_SEPARATE_COMPILATION=1)
+
+GroupSources (test "/")
+
+add_library (
+    lib-asio STATIC
+    test/lib_asio.cpp
+)
+
+set_property(TARGET lib-asio PROPERTY FOLDER "static-libs")
+
+add_library (
+    lib-asio-ssl STATIC
+    test/lib_asio_ssl.cpp
+)
+
+set_property(TARGET lib-asio-ssl PROPERTY FOLDER "static-libs")
+
+add_library (
+    lib-beast STATIC
+    test/lib_beast.cpp
+)
+
+set_property(TARGET lib-beast PROPERTY FOLDER "static-libs")
+
+target_link_libraries(lib-asio lib-beast)
 
 #-------------------------------------------------------------------------------
 #
@@ -176,6 +214,11 @@ endif()
 file (GLOB_RECURSE BOOST_BEAST_FILES
     ${PROJECT_SOURCE_DIR}/include/boost/beast/*.hpp
     ${PROJECT_SOURCE_DIR}/include/boost/beast/*.ipp
+)
+
+file (GLOB_RECURSE BOOST_BEAST_EXPERIMENTAL_FILES
+    ${PROJECT_SOURCE_DIR}/include/boost/beast/_experimental/*.hpp
+    ${PROJECT_SOURCE_DIR}/include/boost/beast/_experimental/*.ipp
 )
 
 file (GLOB_RECURSE COMMON_FILES

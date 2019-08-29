@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2016-2017 Vinnie Falco (vinnie dot falco at gmail dot com)
+// Copyright (c) 2016-2019 Vinnie Falco (vinnie dot falco at gmail dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -10,7 +10,7 @@
 // Test that header file is self-contained.
 #include <boost/beast/http/field.hpp>
 
-#include <boost/beast/unit_test/suite.hpp>
+#include <boost/beast/_experimental/unit_test/suite.hpp>
 
 namespace boost {
 namespace beast {
@@ -50,6 +50,7 @@ public:
         match(field::access_control_allow_headers, "Access-Control-Allow-Headers");
         match(field::access_control_allow_methods, "Access-Control-Allow-Methods");
         match(field::access_control_allow_origin, "Access-Control-Allow-Origin");
+        match(field::access_control_expose_headers, "Access-Control-Expose-Headers");
         match(field::access_control_max_age, "Access-Control-Max-Age");
         match(field::access_control_request_headers, "Access-Control-Request-Headers");
         match(field::access_control_request_method, "Access-Control-Request-Method");

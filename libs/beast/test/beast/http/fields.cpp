@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2016-2017 Vinnie Falco (vinnie dot falco at gmail dot com)
+// Copyright (c) 2016-2019 Vinnie Falco (vinnie dot falco at gmail dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -14,18 +14,75 @@
 #include <boost/beast/http/message.hpp>
 #include <boost/beast/http/type_traits.hpp>
 #include <boost/beast/test/test_allocator.hpp>
-#include <boost/beast/unit_test/suite.hpp>
+#include <boost/beast/_experimental/unit_test/suite.hpp>
 #include <string>
 
 namespace boost {
 namespace beast {
 namespace http {
 
-BOOST_STATIC_ASSERT(is_fields<fields>::value);
-
 class fields_test : public beast::unit_test::suite
 {
 public:
+    static constexpr std::size_t max_static_buffer =
+        sizeof(beast::detail::temporary_buffer);
+
+    template<class T>
+    class test_allocator
+    {
+    public:
+        using value_type = T;
+
+        test_allocator() noexcept(false) {}
+
+        template<class U, class = typename
+            std::enable_if<!std::is_same<test_allocator, U>::value>::type>
+        test_allocator(test_allocator<U> const&) noexcept {}
+
+        value_type*
+        allocate(std::size_t n)
+        {
+            return static_cast<value_type*>(::operator new (n*sizeof(value_type)));
+        }
+
+        void
+        deallocate(value_type* p, std::size_t) noexcept
+        {
+            ::operator delete(p);
+        }
+
+        template<class U>
+        friend
+        bool
+        operator==(test_allocator<T> const&, test_allocator<U> const&) noexcept
+        {
+            return true;
+        }
+
+        template<class U>
+        friend
+        bool
+        operator!=(test_allocator<T> const& x, test_allocator<U> const& y) noexcept
+        {
+            return !(x == y);
+        }
+    };
+
+    using test_fields = basic_fields<test_allocator<char>>;
+
+    BOOST_STATIC_ASSERT(is_fields<fields>::value);
+    BOOST_STATIC_ASSERT(is_fields<test_fields>::value);
+
+    // std::allocator is noexcept movable, fields should satisfy
+    // these constraints as well.
+    BOOST_STATIC_ASSERT(std::is_nothrow_move_constructible<fields>::value);
+    BOOST_STATIC_ASSERT(std::is_nothrow_move_assignable<fields>::value);
+
+    // Check if basic_fields respects throw-constructibility and
+    // propagate_on_container_move_assignment of the allocator.
+    BOOST_STATIC_ASSERT(std::is_nothrow_move_constructible<test_fields>::value);
+    BOOST_STATIC_ASSERT(!std::is_nothrow_move_assignable<test_fields>::value);
+
     template<class Allocator>
     using fa_t = basic_fields<Allocator>;
 
@@ -334,6 +391,20 @@ public:
         BEAST_EXPECT(size(f) == 2);
     }
 
+    void testIteratorErase()
+    {
+        f_t f;
+        f.insert("a", "x");
+        f.insert("b", "y");
+        f.insert("c", "z");
+        BEAST_EXPECT(size(f) == 3);
+        f_t::const_iterator i = std::next(f.begin());
+        f.erase(i);
+        BEAST_EXPECT(size(f) == 2);
+        BEAST_EXPECT(std::next(f.begin(), 0)->name_string() == "a");
+        BEAST_EXPECT(std::next(f.begin(), 1)->name_string() == "c");
+    }
+
     void
     testContainer()
     {
@@ -617,8 +688,7 @@ public:
                     (! res.keep_alive() && ! v));
             };
 
-        BOOST_STATIC_ASSERT(fields::max_static_buffer == 4096);
-        std::string const big(4096 + 1, 'a');
+        std::string const big(max_static_buffer + 1, 'a');
 
         // HTTP/1.0
         res.version(10);
@@ -778,10 +848,10 @@ public:
 
         res.content_length(0);
         BEAST_EXPECT(res[field::content_length] == "0");
-        
+
         res.content_length(100);
         BEAST_EXPECT(res[field::content_length] == "100");
-        
+
         res.content_length(boost::none);
         BEAST_EXPECT(res.count(field::content_length) == 0);
 
@@ -789,12 +859,12 @@ public:
         res.content_length(0);
         BEAST_EXPECT(res[field::content_length] == "0");
         BEAST_EXPECT(res.count(field::transfer_encoding) == 0);
-        
+
         res.set(field::transfer_encoding, "chunked");
         res.content_length(100);
         BEAST_EXPECT(res[field::content_length] == "100");
         BEAST_EXPECT(res.count(field::transfer_encoding) == 0);
-        
+
         res.set(field::transfer_encoding, "chunked");
         res.content_length(boost::none);
         BEAST_EXPECT(res.count(field::content_length) == 0);
@@ -806,12 +876,12 @@ public:
             res.content_length(0);
             BEAST_EXPECT(res[field::content_length] == "0");
             BEAST_EXPECT(res[field::transfer_encoding] == s);
-        
+
             res.set(field::transfer_encoding, s);
             res.content_length(100);
             BEAST_EXPECT(res[field::content_length] == "100");
             BEAST_EXPECT(res[field::transfer_encoding] == s);
-        
+
             res.set(field::transfer_encoding, s);
             res.content_length(boost::none);
             BEAST_EXPECT(res.count(field::content_length) == 0);
@@ -821,12 +891,12 @@ public:
             res.content_length(0);
             BEAST_EXPECT(res[field::content_length] == "0");
             BEAST_EXPECT(res[field::transfer_encoding] == s);
-        
+
             res.set(field::transfer_encoding, s + ", chunked");
             res.content_length(100);
             BEAST_EXPECT(res[field::content_length] == "100");
             BEAST_EXPECT(res[field::transfer_encoding] == s);
-        
+
             res.set(field::transfer_encoding, s + ", chunked");
             res.content_length(boost::none);
             BEAST_EXPECT(res.count(field::content_length) == 0);
@@ -836,12 +906,12 @@ public:
             res.content_length(0);
             BEAST_EXPECT(res[field::content_length] == "0");
             BEAST_EXPECT(res[field::transfer_encoding] == "chunked, " + s);
-        
+
             res.set(field::transfer_encoding, "chunked, " + s);
             res.content_length(100);
             BEAST_EXPECT(res[field::content_length] == "100");
             BEAST_EXPECT(res[field::transfer_encoding] == "chunked, " + s);
-        
+
             res.set(field::transfer_encoding, "chunked, " + s);
             res.content_length(boost::none);
             BEAST_EXPECT(res.count(field::content_length) == 0);
@@ -850,8 +920,7 @@ public:
 
         check("foo");
 
-        BOOST_STATIC_ASSERT(fields::max_static_buffer == 4096);
-        std::string const big(4096 + 1, 'a');
+        std::string const big(max_static_buffer + 1, 'a');
 
         check(big);
     }
@@ -926,6 +995,7 @@ public:
         testHeaders();
         testRFC2616();
         testErase();
+        testIteratorErase();
         testContainer();
         testPreparePayload();
 

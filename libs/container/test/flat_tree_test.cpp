@@ -12,19 +12,21 @@
 #include <boost/container/stable_vector.hpp>
 #include <boost/container/static_vector.hpp>
 
+#include <iostream>
+
 #include "movable_int.hpp"
 #include "dummy_test_allocator.hpp"
 
 using namespace boost::container;
 
-typedef boost::container::container_detail::pair<test::movable_and_copyable_int, test::movable_and_copyable_int> pair_t;
+typedef boost::container::dtl::pair<test::movable_and_copyable_int, test::movable_and_copyable_int> pair_t;
 
 namespace boost {
 namespace container {
 
 //Explicit instantiation to detect compilation errors
 
-namespace container_detail {
+namespace dtl {
 
 template class flat_tree
    < pair_t
@@ -89,7 +91,7 @@ template class flat_tree
    , static_vector<test::movable_and_copyable_int, 10>
 >;
 
-}  //container_detail {
+}  //dtl {
 }} //boost::container
 
 #if (__cplusplus > 201103L)
@@ -97,7 +99,7 @@ template class flat_tree
 
 namespace boost{
 namespace container{
-namespace container_detail{
+namespace dtl{
 
 template class flat_tree
 < test::movable_and_copyable_int
@@ -113,12 +115,42 @@ template class flat_tree
    , std::vector<pair_t>
 >;
 
-}  //container_detail {
+}  //dtl {
 }} //boost::container
 
 #endif
 
 int main ()
 {
+   ////////////////////////////////////
+   //    has_trivial_destructor_after_move testing
+   ////////////////////////////////////
+   // default
+   {
+      typedef boost::container::dtl::flat_tree<int, boost::container::dtl::identity<int>,
+              std::less<int>, void> tree;
+      typedef tree::container_type container_type;
+      typedef tree::key_compare key_compare;
+      if (boost::has_trivial_destructor_after_move<tree>::value !=
+          boost::has_trivial_destructor_after_move<container_type>::value &&
+          boost::has_trivial_destructor_after_move<key_compare>::value) {
+         std::cerr << "has_trivial_destructor_after_move(default allocator) test failed" << std::endl;
+         return 1;
+      }
+   }
+   // std::allocator
+   {
+      typedef boost::container::dtl::flat_tree<int, boost::container::dtl::identity<int>,
+              std::less<int>, std::allocator<int> > tree;
+      typedef tree::container_type container_type;
+      typedef tree::key_compare key_compare;
+      if (boost::has_trivial_destructor_after_move<tree>::value !=
+          boost::has_trivial_destructor_after_move<container_type>::value &&
+          boost::has_trivial_destructor_after_move<key_compare>::value) {
+         std::cerr << "has_trivial_destructor_after_move(std::allocator) test failed" << std::endl;
+         return 1;
+      }
+   }
+
    return 0;
 }

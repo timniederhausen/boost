@@ -2,7 +2,7 @@
 # Distributed under the Boost Software License, Version 1.0.
 # (See accompanying file LICENSE.md or copy at http://boost.org/LICENSE_1_0.txt)
 
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.9)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 ##############################################################################
@@ -10,7 +10,6 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 ##############################################################################
 option(BOOST_HANA_ENABLE_CONCEPT_CHECKS "Enable concept checking in the interface methods." ON)
 option(BOOST_HANA_ENABLE_DEBUG_MODE "Enable Hana's debug mode." OFF)
-option(BOOST_HANA_ENABLE_CPP17 "Build with C++17 instead of usual required C++ standard. Useful for testing." OFF)
 
 option(BOOST_HANA_ENABLE_STRING_UDL
 "Enable the GNU extension allowing the special string literal operator\
@@ -49,23 +48,18 @@ include(CheckCxxCompilerSupport)
 ##############################################################################
 include(CheckCXXCompilerFlag)
 add_library(hana INTERFACE)
-target_include_directories(hana INTERFACE "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
-                                          $<INSTALL_INTERFACE:include>)
-# With Clang on Windows, the -std=c++14 flag is incorrectly set and the compiler
-# complains about the unknown option. TODO: Remove this workaround once the
-# underlying bug is fixed in CMake: https://gitlab.kitware.com/cmake/cmake/issues/17015
-if (NOT (MSVC AND ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang"))
-    if (BOOST_HANA_ENABLE_CPP17)
-        target_compile_features(hana INTERFACE cxx_std_17)
-    else()
-        target_compile_features(hana INTERFACE cxx_std_14)
-    endif()
-endif()
+target_include_directories(hana INTERFACE "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>")
+target_compile_features(hana INTERFACE cxx_std_14)
 
 # Export the `hana` library into a HanaConfig.cmake file
-install(TARGETS hana EXPORT HanaConfig)
-install(EXPORT HanaConfig       DESTINATION lib/cmake/hana)
-install(DIRECTORY include/boost DESTINATION include FILES_MATCHING PATTERN "*.hpp")
+install(TARGETS hana
+        EXPORT HanaConfig
+        INCLUDES DESTINATION include)
+install(EXPORT HanaConfig
+        DESTINATION lib/cmake/hana)
+install(DIRECTORY include/boost
+        DESTINATION include
+        FILES_MATCHING PATTERN "*.hpp")
 
 # Also install an optional pkg-config file
 configure_file(cmake/hana.pc.in hana.pc @ONLY)
@@ -86,14 +80,21 @@ function(boost_hana_set_test_properties target)
         endif()
     endmacro()
 
-    setflag(BOOST_HANA_HAS_FDIAGNOSTICS_COLOR        -fdiagnostics-color)
-    setflag(BOOST_HANA_HAS_FTEMPLATE_BACKTRACE_LIMIT -ftemplate-backtrace-limit=0)
-    setflag(BOOST_HANA_HAS_PEDANTIC                  -pedantic)
-    setflag(BOOST_HANA_HAS_WALL                      -Wall)
-    setflag(BOOST_HANA_HAS_WERROR                    -Werror)
-    setflag(BOOST_HANA_HAS_WEXTRA                    -Wextra)
-    setflag(BOOST_HANA_HAS_WNO_UNUSED_LOCAL_TYPEDEFS -Wno-unused-local-typedefs)
-    setflag(BOOST_HANA_HAS_WWRITE_STRINGS            -Wwrite-strings)
+    if (NOT MSVC)
+        setflag(BOOST_HANA_HAS_FDIAGNOSTICS_COLOR         -fdiagnostics-color)
+        setflag(BOOST_HANA_HAS_FTEMPLATE_BACKTRACE_LIMIT  -ftemplate-backtrace-limit=0)
+        setflag(BOOST_HANA_HAS_PEDANTIC                   -pedantic)
+        setflag(BOOST_HANA_HAS_WALL                       -Wall)
+        setflag(BOOST_HANA_HAS_WERROR                     -Werror)
+        setflag(BOOST_HANA_HAS_WEXTRA                     -Wextra)
+        setflag(BOOST_HANA_HAS_WNO_SELF_ASSIGN_OVERLOADED -Wno-self-assign-overloaded)
+        setflag(BOOST_HANA_HAS_WNO_UNUSED_LOCAL_TYPEDEFS  -Wno-unused-local-typedefs)
+        setflag(BOOST_HANA_HAS_WWRITE_STRINGS             -Wwrite-strings)
+    else()
+        setflag(BOOST_HANA_HAS_MSVC_EHSC                 -EHsc)
+        setflag(BOOST_HANA_HAS_MSVC_BIGOBJ               -bigobj)
+        setflag(BOOST_HANA_HAS_MSVC_TERNARY              -Zc:ternary)
+    endif()
 
     if (NOT BOOST_HANA_ENABLE_EXCEPTIONS)
         setflag(BOOST_HANA_HAS_FNO_EXCEPTIONS -fno-exceptions)
@@ -108,11 +109,13 @@ function(boost_hana_set_test_properties target)
     endif()
 
     if (BOOST_HANA_ENABLE_STRING_UDL)
-        target_compile_definitions(${target} PRIVATE -DBOOST_HANA_CONFIG_ENABLE_STRING_UDL)
-        # GCC pretends to have the flag, but produces a "unrecognized command line option"
-        # warning when we use it.
-        if (NOT ${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
-            setflag(BOOST_HANA_HAS_WNO_GNU_STRING_UDL -Wno-gnu-string-literal-operator-template)
+        if (NOT MSVC)
+            target_compile_definitions(${target} PRIVATE -DBOOST_HANA_CONFIG_ENABLE_STRING_UDL)
+            # GCC pretends to have the flag, but produces a "unrecognized command line option"
+            # warning when we use it.
+            if (NOT ${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
+                setflag(BOOST_HANA_HAS_WNO_GNU_STRING_UDL -Wno-gnu-string-literal-operator-template)
+            endif()
         endif()
     endif()
 endfunction()
@@ -121,7 +124,7 @@ endfunction()
 ##############################################################################
 # Look for the rest of Boost, which is an optional dependency of some tests.
 ##############################################################################
-find_package(Boost 1.59)
+find_package(Boost 1.64)
 if (NOT Boost_FOUND)
     message(WARNING "The rest of Boost was not found; some tests and examples will be disabled.")
 endif()
@@ -155,10 +158,16 @@ endfunction()
 ##############################################################################
 # Setup the `check` target to build and then run all the tests and examples.
 ##############################################################################
-add_custom_target(check
+add_custom_target(hana_check
     COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure
     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-    COMMENT "Build and then run all the tests and examples.")
+    COMMENT "Build and then run all the tests and examples."
+    USES_TERMINAL)
+if (NOT TARGET check)
+    add_custom_target(check DEPENDS hana_check)
+else()
+    add_dependencies(check hana_check)
+endif()
 
 
 ##############################################################################
