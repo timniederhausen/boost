@@ -365,22 +365,6 @@ struct value_init_t
 //! should be value initialized
 BOOST_CONTAINER_CONSTANT_VAR value_init_t value_init = value_init_t();
 
-namespace container_detail_really_deep_namespace {
-
-//Otherwise, gcc issues a warning of previously defined
-//anonymous_instance and unique_instance
-struct dummy
-{
-   dummy()
-   {
-      (void)ordered_range;
-      (void)ordered_unique_range;
-      (void)default_init;
-   }
-};
-
-}  //detail_really_deep_namespace {
-
 typedef const std::piecewise_construct_t & piecewise_construct_t;
 
 #endif   //#ifndef BOOST_CONTAINER_DOXYGEN_INVOKED
