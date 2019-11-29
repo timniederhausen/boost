@@ -269,7 +269,7 @@ BOOST_CONTAINER_FORCEINLINE Pointer &get_ptr(vec_iterator<Pointer, IsConst> &it)
 {  return  it.get_ptr();  }
 
 struct vector_uninitialized_size_t {};
-static const vector_uninitialized_size_t vector_uninitialized_size = vector_uninitialized_size_t();
+inline constexpr vector_uninitialized_size_t vector_uninitialized_size = vector_uninitialized_size_t();
 
 template <class T>
 struct vector_value_traits_base
@@ -327,7 +327,7 @@ struct vector_alloc_holder
       static bool are_swap_propagable(const allocator_type &l_a, pointer l_p, const allocator_type &r_a, pointer r_p, bool const propagate_allocator)
    {
       (void)propagate_allocator; (void)l_p; (void)r_p; (void)l_a; (void)r_a;
-      const bool all_storage_propagable = !allocator_traits_type::is_partially_propagable::value || 
+      const bool all_storage_propagable = !allocator_traits_type::is_partially_propagable::value ||
               !(allocator_traits_type::storage_is_unpropagable(l_a, l_p) || allocator_traits_type::storage_is_unpropagable(r_a, r_p));
       return all_storage_propagable && (propagate_allocator || allocator_traits_type::equal(l_a, r_a));
    }
@@ -563,7 +563,7 @@ struct vector_alloc_holder
          boost::container::throw_length_error("get_next_capacity, allocator's max size reached");
       }
       (clamp_by_stored_size_type<size_type>)(prefer_in_recvd_out_size, stored_size_type());
-      //Allocate memory 
+      //Allocate memory
       pointer p = this->alloc().allocation_command(command, limit_size, prefer_in_recvd_out_size, reuse);
       //If after allocation prefer_in_recvd_out_size is not representable by stored_size_type, truncate it.
       (clamp_by_stored_size_type<size_type>)(prefer_in_recvd_out_size, stored_size_type());
@@ -587,7 +587,7 @@ struct vector_alloc_holder<Allocator, StoredSizeType, version_0>
    typedef typename allocator_traits_type::size_type     size_type;
    typedef typename allocator_traits_type::value_type    value_type;
    typedef StoredSizeType                                stored_size_type;
-      
+
    template <class OtherAllocator, class OtherStoredSizeType, class OtherAllocatorVersion>
    friend struct vector_alloc_holder;
 
@@ -698,10 +698,10 @@ struct vector_alloc_holder<Allocator, StoredSizeType, version_0>
 
    BOOST_CONTAINER_FORCEINLINE pointer start() const       BOOST_NOEXCEPT_OR_NOTHROW
    {  return allocator_type::internal_storage();  }
-   
+
    BOOST_CONTAINER_FORCEINLINE size_type capacity() const BOOST_NOEXCEPT_OR_NOTHROW
    {  return allocator_type::internal_capacity;  }
-   
+
    stored_size_type m_size;
 
    private:
@@ -2398,7 +2398,7 @@ private:
          if(!n) {
             ::boost::container::uninitialized_move_alloc(this->m_holder.alloc(), pbeg, pend, d_first);
             break;
-         } 
+         }
          else if(pbeg == pend) {
             ::boost::container::uninitialized_move_alloc_n(this->m_holder.alloc(), first, n, d_first);
             break;
