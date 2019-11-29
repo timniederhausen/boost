@@ -332,7 +332,7 @@ struct ordered_range_t
 
 //! Value used to tag that the input range is
 //! guaranteed to be ordered
-static const ordered_range_t ordered_range = ordered_range_t();
+inline constexpr ordered_range_t ordered_range = ordered_range_t();
 
 //! Type used to tag that the input range is
 //! guaranteed to be ordered and unique
@@ -342,7 +342,7 @@ struct ordered_unique_range_t
 
 //! Value used to tag that the input range is
 //! guaranteed to be ordered and unique
-static const ordered_unique_range_t ordered_unique_range = ordered_unique_range_t();
+inline constexpr ordered_unique_range_t ordered_unique_range = ordered_unique_range_t();
 
 //! Type used to tag that the inserted values
 //! should be default initialized
@@ -351,7 +351,7 @@ struct default_init_t
 
 //! Value used to tag that the inserted values
 //! should be default initialized
-static const default_init_t default_init = default_init_t();
+inline constexpr default_init_t default_init = default_init_t();
 #ifndef BOOST_CONTAINER_DOXYGEN_INVOKED
 
 //! Type used to tag that the inserted values
@@ -361,23 +361,7 @@ struct value_init_t
 
 //! Value used to tag that the inserted values
 //! should be value initialized
-static const value_init_t value_init = value_init_t();
-
-namespace container_detail_really_deep_namespace {
-
-//Otherwise, gcc issues a warning of previously defined
-//anonymous_instance and unique_instance
-struct dummy
-{
-   dummy()
-   {
-      (void)ordered_range;
-      (void)ordered_unique_range;
-      (void)default_init;
-   }
-};
-
-}  //detail_really_deep_namespace {
+inline constexpr value_init_t value_init = value_init_t();
 
 typedef const std::piecewise_construct_t & piecewise_construct_t;
 
