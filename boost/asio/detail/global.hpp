@@ -17,7 +17,9 @@
 
 #include <boost/asio/detail/config.hpp>
 
-#if !defined(BOOST_ASIO_HAS_THREADS)
+#if (ASIO_MSVC >= 1900) || (__GNUC__ > 4)
+// nothing
+#elif !defined(BOOST_ASIO_HAS_THREADS)
 # include <boost/asio/detail/null_global.hpp>
 #elif defined(BOOST_ASIO_WINDOWS)
 # include <boost/asio/detail/win_global.hpp>
@@ -36,7 +38,10 @@ namespace detail {
 template <typename T>
 inline T& global()
 {
-#if !defined(BOOST_ASIO_HAS_THREADS)
+#if (ASIO_MSVC >= 1900) || (__GNUC__ > 4)
+  static T instance;
+  return instance;
+#elif !defined(BOOST_ASIO_HAS_THREADS)
   return null_global<T>();
 #elif defined(BOOST_ASIO_WINDOWS)
   return win_global<T>();
