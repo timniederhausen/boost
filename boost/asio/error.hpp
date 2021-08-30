@@ -225,35 +225,97 @@ enum misc_errors
   fd_set_failure
 };
 
-inline const boost::system::error_category& get_system_category()
+constexpr const boost::system::error_category& get_system_category()
 {
   return boost::system::system_category();
 }
 
 #if !defined(BOOST_ASIO_WINDOWS) && !defined(__CYGWIN__)
 
-extern BOOST_ASIO_DECL
-const boost::system::error_category& get_netdb_category();
+namespace detail {
 
-extern BOOST_ASIO_DECL
-const boost::system::error_category& get_addrinfo_category();
+class netdb_category : public boost::system::error_category
+{
+public:
+  constexpr netdb_category() = default;
+
+  BOOST_ASIO_DECL const char* name() const BOOST_ASIO_ERROR_CATEGORY_NOEXCEPT;
+  BOOST_ASIO_DECL std::string message(int value) const;
+};
+
+class addrinfo_category : public boost::system::error_category
+{
+public:
+  constexpr addrinfo_category() = default;
+
+  BOOST_ASIO_DECL const char* name() const BOOST_ASIO_ERROR_CATEGORY_NOEXCEPT;
+  BOOST_ASIO_DECL std::string message(int value) const;
+};
+
+template <typename T>
+struct error_categories2
+{
+  static constexpr netdb_category netdb_cat{};
+  static constexpr addrinfo_category addrinfo_cat{};
+};
+
+template <typename T>
+constexpr netdb_category error_categories2<T>::netdb_cat;
+template <typename T>
+constexpr addrinfo_category error_categories2<T>::addrinfo_cat;
+
+} // namespace detail
+
+constexpr const boost::system::error_category& get_netdb_category()
+{
+  return detail::error_categories2<void>::netdb_cat;
+}
+
+constexpr const boost::system::error_category& get_addrinfo_category()
+{
+  return detail::error_categories2<void>::addrinfo_cat;
+}
 
 #else // !defined(BOOST_ASIO_WINDOWS) && !defined(__CYGWIN__)
 
-inline const boost::system::error_category& get_netdb_category()
+constexpr const boost::system::error_category& get_netdb_category()
 {
   return get_system_category();
 }
 
-inline const boost::system::error_category& get_addrinfo_category()
+constexpr const boost::system::error_category& get_addrinfo_category()
 {
   return get_system_category();
 }
 
 #endif // !defined(BOOST_ASIO_WINDOWS) && !defined(__CYGWIN__)
 
-extern BOOST_ASIO_DECL
-const boost::system::error_category& get_misc_category();
+namespace detail {
+
+class misc_category : public boost::system::error_category
+{
+public:
+  constexpr misc_category() = default;
+
+  BOOST_ASIO_DECL const char* name() const BOOST_ASIO_ERROR_CATEGORY_NOEXCEPT;
+  BOOST_ASIO_DECL std::string message(int value) const;
+};
+
+template <typename T>
+struct error_categories
+{
+  static constexpr misc_category misc_cat{};
+};
+
+template <typename T>
+constexpr misc_category error_categories<T>::misc_cat;
+
+} // namespace detail
+
+constexpr const boost::system::error_category& get_misc_category()
+{
+  return detail::error_categories<void>::misc_cat;
+}
 
 } // namespace error
 } // namespace asio
