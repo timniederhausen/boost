@@ -11,7 +11,7 @@
 #include <boost/math/concepts/real_concept.hpp>
 #define BOOST_TEST_MAIN
 #include <boost/test/unit_test.hpp>
-#include <boost/test/floating_point_comparison.hpp>
+#include <boost/test/tools/floating_point_comparison.hpp>
 #include <boost/math/special_functions/math_fwd.hpp>
 #include <boost/math/constants/constants.hpp>
 //#include <boost/math/special_functions/next.hpp>
@@ -59,7 +59,7 @@ void test_spots(T, const char* type_name)
     BOOST_MATH_STD_USING
     // Function values calculated on http://functions.wolfram.com/
     // Note that Mathematica's EllipticE accepts k^2 as the second parameter.
-    static const boost::array<boost::array<T, 3>, 18> data1 = {{
+    static const std::array<std::array<T, 3>, 18> data1 = {{
        { { SC_(0.5), SC_(0.5), SC_(0.055317014255129651475392155709691519) } },
        { { SC_(-0.5), SC_(0.5), SC_(-0.055317014255129651475392155709691519) } },
         { { SC_(0), SC_(0.5), SC_(0) } },

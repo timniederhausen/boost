@@ -12,5 +12,6 @@
 /.project
 /.pydevproject
 
+/more
 **/doc/*
 *.html

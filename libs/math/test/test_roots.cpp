@@ -7,7 +7,7 @@
 
 #define BOOST_TEST_MAIN
 #include <boost/test/unit_test.hpp>
-#include <boost/test/floating_point_comparison.hpp>
+#include <boost/test/tools/floating_point_comparison.hpp>
 #include <boost/test/results_collector.hpp>
 #include <boost/math/special_functions/beta.hpp>
 #include <boost/math/distributions/skew_normal.hpp>
@@ -384,7 +384,7 @@ void test_inverses(const T& data)
          value_type inv = inverse_ibeta_halley(Real(data[i][0]), Real(data[i][1]), Real(data[i][5]));
          BOOST_CHECK_CLOSE_EX(Real(data[i][2]), inv, precision, i);
          inv = inverse_ibeta_halley_neg(Real(data[i][0]), Real(data[i][1]), Real(data[i][5]));
-         BOOST_ASSERT(boost::math::isfinite(inv));
+         BOOST_MATH_ASSERT(boost::math::isfinite(inv));
          BOOST_CHECK_CLOSE_EX(Real(data[i][2]), inv, precision, i);
          inv = inverse_ibeta_schroder(Real(data[i][0]), Real(data[i][1]), Real(data[i][5]));
          BOOST_CHECK_CLOSE_EX(Real(data[i][2]), inv, precision, i);
@@ -458,12 +458,12 @@ void test_complex_newton()
     Complex root = complex_newton(f, guess);
 
     BOOST_CHECK(abs(root.real()) <= tol);
-    BOOST_CHECK_CLOSE(root.imag(), 1, tol);
+    BOOST_CHECK_CLOSE(root.imag(), (Real)1, tol);
 
     guess = -guess;
     root = complex_newton(f, guess);
     BOOST_CHECK(abs(root.real()) <= tol);
-    BOOST_CHECK_CLOSE(root.imag(), -1, tol);
+    BOOST_CHECK_CLOSE(root.imag(), (Real)-1, tol);
 
     // Test that double roots are handled correctly-as correctly as possible.
     // Convergence at a double root is not quadratic.
@@ -474,7 +474,7 @@ void test_complex_newton()
     auto g = [&](Complex z) { return std::make_pair<Complex, Complex>(p(z), p_prime(z)); };
     root = complex_newton(g, guess);
     BOOST_CHECK(abs(root.real()) < 10*sqrt(tol));
-    BOOST_CHECK_CLOSE(root.imag(), 1, tol);
+    BOOST_CHECK_CLOSE(root.imag(), (Real)1, tol);
 
     // Test that zero derivatives are handled.
     // p(z) = z^2 + iz + 1
@@ -539,28 +539,39 @@ void test_daubechies_fails()
 template<class Real>
 void test_solve_real_quadratic()
 {
+    #ifndef __CYGWIN__
     Real tol = std::numeric_limits<Real>::epsilon();
+    #else
+    Real tol = 2*std::numeric_limits<Real>::epsilon();
+    #endif
+
     using boost::math::tools::quadratic_roots;
     auto [x0, x1] = quadratic_roots<Real>(1, 0, -1);
     BOOST_CHECK_CLOSE(x0, Real(-1), tol);
     BOOST_CHECK_CLOSE(x1, Real(1), tol);
 
-    auto p = quadratic_roots<Real>(7, 0, 0);
+    auto p = quadratic_roots((Real)7, (Real)0, (Real)0);
     BOOST_CHECK_SMALL(p.first, tol);
     BOOST_CHECK_SMALL(p.second, tol);
 
     // (x-7)^2 = x^2 - 14*x + 49:
-    p = quadratic_roots<Real>(1, -14, 49);
+    p = quadratic_roots((Real)1, (Real)-14, (Real)49);
     BOOST_CHECK_CLOSE(p.first, Real(7), tol);
     BOOST_CHECK_CLOSE(p.second, Real(7), tol);
 
+    // The following tests do not pass with Cygwin as it makes no attempt at having a correct FMA
+    // https://sourceware.org/git/gitweb.cgi?p=newlib-cygwin.git;a=blob;f=newlib/libm/common/s_fma.c
+    #ifndef __CYGWIN__
+    
     // This test does not pass in multiprecision,
     // due to the fact it does not have an fma:
     if (std::is_floating_point<Real>::value)
     {
         // (x-1)(x-1-eps) = x^2 + (-eps - 2)x + (1)(1+eps)
         Real eps = 2*std::numeric_limits<Real>::epsilon();
-        p = quadratic_roots<Real>(256, 256*(-2 - eps), 256*(1 + eps));
+        Real b = 256 * (-2 - eps);
+        Real c = 256 * (1 + eps);
+        p = quadratic_roots((Real)256, b, c);
         BOOST_CHECK_CLOSE(p.first, Real(1), tol);
         BOOST_CHECK_CLOSE(p.second, Real(1) + eps, tol);
     }
@@ -569,10 +580,12 @@ void test_solve_real_quadratic()
     {
         // Kahan's example: This is the test that demonstrates the necessity of the fma instruction.
         // https://en.wikipedia.org/wiki/Loss_of_significance#Instability_of_the_quadratic_equation
-        p = quadratic_roots<Real>(94906265.625, -189812534, 94906268.375);
+        p = quadratic_roots<Real>((Real)94906265.625, (Real )-189812534, (Real)94906268.375);
         BOOST_CHECK_CLOSE_FRACTION(p.first, Real(1), tol);
         BOOST_CHECK_CLOSE_FRACTION(p.second, 1.000000028975958, 4*tol);
     }
+    
+    #endif // __CYGWIN__
 }
 
 template<class Z>
@@ -617,8 +630,24 @@ void test_solve_complex_quadratic()
 
 }
 
-
 #endif
+
+void test_failures()
+{
+#if !defined(BOOST_NO_CXX11_LAMBDAS)
+   // There is no root:
+   BOOST_CHECK_THROW(boost::math::tools::newton_raphson_iterate([](double x) { return std::make_pair(x * x + 1, 2 * x); }, 10.0, -12.0, 12.0, 52), boost::math::evaluation_error);
+   BOOST_CHECK_THROW(boost::math::tools::newton_raphson_iterate([](double x) { return std::make_pair(x * x + 1, 2 * x); }, -10.0, -12.0, 12.0, 52), boost::math::evaluation_error);
+   // There is a root, but a bad guess takes us into a local minima:
+   BOOST_CHECK_THROW(boost::math::tools::newton_raphson_iterate([](double x) { return std::make_pair(boost::math::pow<6>(x) - 2 * boost::math::pow<4>(x) + x + 0.5, 6 * boost::math::pow<5>(x) - 8 * boost::math::pow<3>(x) + 1); }, 0.75, -20., 20., 52), boost::math::evaluation_error);
+
+   // There is no root:
+   BOOST_CHECK_THROW(boost::math::tools::halley_iterate([](double x) { return std::make_tuple(x * x + 1, 2 * x, 2); }, 10.0, -12.0, 12.0, 52), boost::math::evaluation_error);
+   BOOST_CHECK_THROW(boost::math::tools::halley_iterate([](double x) { return std::make_tuple(x * x + 1, 2 * x, 2); }, -10.0, -12.0, 12.0, 52), boost::math::evaluation_error);
+   // There is a root, but a bad guess takes us into a local minima:
+   BOOST_CHECK_THROW(boost::math::tools::halley_iterate([](double x) { return std::make_tuple(boost::math::pow<6>(x) - 2 * boost::math::pow<4>(x) + x + 0.5, 6 * boost::math::pow<5>(x) - 8 * boost::math::pow<3>(x) + 1, 30 * boost::math::pow<4>(x) - 24 * boost::math::pow<2>(x)); }, 0.75, -20., 20., 52), boost::math::evaluation_error);
+#endif
+}
 
 BOOST_AUTO_TEST_CASE( test_main )
 {
@@ -641,5 +670,5 @@ BOOST_AUTO_TEST_CASE( test_main )
     test_solve_int_quadratic<int>();
     test_solve_complex_quadratic<std::complex<double>>();
 #endif
-
+    test_failures();
 }

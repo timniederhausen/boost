@@ -369,29 +369,29 @@ BOOST_TEST_CASE_TEMPLATE_FUNCTION( trim_test, CharT )
 
     bcs0 = TEST_STRING;
     bcs0.trim_right( bcs0.size() - bcs0.find( LITERAL( "t_s" ) ) - 3 );
-    BOOST_TEST( bcs0 == LITERAL( "test_s" ) );
+    BOOST_TEST( bcs0 == const_cast<CharT const*>(LITERAL( "test_s" ) ));
 
     bcs0.trim_left( bcs0.find( LITERAL( "t_s" ) ) );
-    BOOST_TEST( bcs0 == LITERAL( "t_s" ) );
+    BOOST_TEST( bcs0 == const_cast<CharT const*>(LITERAL( "t_s" )) );
 
     LOCAL_DEF( bcs1, "abcd   " );
     LOCAL_DEF( bcs2, "     abcd" );
     LOCAL_DEF( bcs3, "  abcd  " );
 
     bcs1.trim_right();
-    BOOST_TEST( bcs1 == LITERAL( "abcd" ) );
+    BOOST_TEST( bcs1 == const_cast<CharT const*>(LITERAL( "abcd" )) );
 
     bcs2.trim_left();
-    BOOST_TEST( bcs2 == LITERAL( "abcd" ) );
+    BOOST_TEST( bcs2 == const_cast<CharT const*>(LITERAL( "abcd" )) );
 
     bcs3.trim( LITERAL( "\"" ) );
-    BOOST_TEST( bcs3 == LITERAL( "  abcd  " ) );
+    BOOST_TEST( bcs3 == const_cast<CharT const*>(LITERAL( "  abcd  " )) );
 
     bcs3.trim();
-    BOOST_TEST( bcs3 == LITERAL( "abcd" ) );
+    BOOST_TEST( bcs3 == const_cast<CharT const*>(LITERAL( "abcd" )) );
 
     bcs3.trim();
-    BOOST_TEST( bcs3 == LITERAL( "abcd" ) );
+    BOOST_TEST( bcs3 == const_cast<CharT const*>(LITERAL( "abcd" )) );
 }
 
 //____________________________________________________________________________//
@@ -460,6 +460,35 @@ void const_conversion()
 
 //____________________________________________________________________________//
 
+#if defined(BOOST_TEST_STRING_VIEW)
+BOOST_TEST_CASE_TEMPLATE_FUNCTION( string_view_support, CharT )
+{
+  using namespace std::literals;
+  typedef std::basic_string_view<CharT> string_view_t;
+  namespace utf = boost::unit_test;
+
+  {
+    string_view_t sv = LITERAL("");
+
+    utf::stringview_cstring_helper<CharT, string_view_t> svh = sv;
+    BOOST_TEST( svh.size() == 0U );
+    BOOST_TEST( svh.is_empty() );
+  }
+
+
+  {
+    string_view_t sv = LITERAL("bla");
+
+    utf::stringview_cstring_helper<CharT, string_view_t> svh = sv;
+    BOOST_TEST( svh.size() == 3U );
+    BOOST_TEST( !svh.is_empty() );
+  }
+}
+#endif
+
+
+//____________________________________________________________________________//
+
 utf::test_suite*
 init_unit_test_suite( int /*argc*/, char* /*argv*/[] )
 {
@@ -479,6 +508,10 @@ init_unit_test_suite( int /*argc*/, char* /*argv*/[] )
     test->add( BOOST_TEST_CASE_TEMPLATE( io_test, io_test_types ) );
     test->add( BOOST_TEST_CASE_TEMPLATE( find_test, char_types ) );
     test->add( BOOST_TEST_CASE( &const_conversion ) );
+  
+#if defined(BOOST_TEST_STRING_VIEW)
+    test->add( BOOST_TEST_CASE_TEMPLATE( string_view_support, char_types ) );
+#endif
 
     return test;
 }
