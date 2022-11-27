@@ -1,18 +1,39 @@
+config("supports") {
+  defines = []
+
+  # TODO: determine platforms that have this!
+  if (true) {
+    defines += [ "BOOST_FILESYSTEM_NO_CXX20_ATOMIC_REF" ]
+  }
+}
+
 source_set("filesystem") {
   sources = [
+    "src/atomic_ref.hpp",
+    "src/atomic_tools.hpp",
     "src/codecvt_error_category.cpp",
+    "src/directory.cpp",
+    "src/error_handling.hpp",
+    "src/exception.cpp",
     "src/operations.cpp",
     "src/path.cpp",
     "src/path_traits.cpp",
+    "src/platform_config.hpp",
     "src/portability.cpp",
+    "src/posix_tools.hpp",
+    "src/private_config.hpp",
     "src/unique_path.cpp",
     "src/utf8_codecvt_facet.cpp",
     "src/windows_file_codecvt.cpp",
+    "src/windows_file_codecvt.hpp",
+    "src/windows_tools.hpp",
   ]
 
   public_deps = [
     "../system",
   ]
+
+  configs += [ ":supports" ]
 
   public_configs = [ "../..:boost_config" ]
 }

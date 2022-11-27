@@ -1,0 +1,89 @@
+declare_args() {
+  boost_context_implementation = "fcontext"
+}
+
+config("context_config") {
+  defines = []
+
+  if (boost_context_implementation == "ucontext") {
+    defines += [ "BOOST_USE_UCONTEXT" ]
+  }
+
+  if (boost_context_implementation == "winfib") {
+    defines += [ "BOOST_USE_WINFIB" ]
+  }
+}
+
+source_set("context") {
+  if (is_win) {
+    _binary_format = "pe"
+  } else if (is_apple) {
+    _binary_format = "mach-o"
+  } else {
+    _binary_format = "elf"
+  }
+
+  if (is_win) {
+    _abi = "ms"
+  } else {
+    _abi = "sysv"
+  }
+
+  if (current_cpu == "x86") {
+    _arch = "i386"
+  } else if (current_cpu == "x64") {
+    _arch = "x86_64"
+  }
+  # TODO
+
+  if (is_win && !is_clang) {
+    if (current_cpu == "arm" || current_cpu == "arm64") {
+      _assembler = "armasm"
+    } else {
+      _assembler = "masm"
+    }
+  } else {
+    _assembler = "gas"
+  }
+
+  if (_binary_format == "pe") {
+    _asm_ext = ".asm"
+  } else if (_assembler == "gas") {
+    _asm_ext = ".S"
+  } else {
+    _asm_ext = ".asm"
+  }
+
+  sources = []
+
+  if (boost_context_implementation == "fcontext") {
+    _asm_suffix = "${_arch}_${_abi}_${_binary_format}_${_assembler}${_asm_ext}"
+
+    sources += [
+      "src/asm/make_${_asm_suffix}",
+      "src/asm/jump_${_asm_suffix}",
+      "src/asm/ontop_${_asm_suffix}",
+    ]
+  } else {
+    sources += [
+      "src/continuation.cpp",
+      "src/fiber.cpp",
+    ]
+  }
+
+  if (is_win) {
+    sources += [ "src/windows/stack_traits.cpp" ]
+  } else {
+    sources += [ "src/posix/stack_traits.cpp" ]
+  }
+
+  defines = [
+    "BOOST_CONTEXT_SOURCE",
+    "BOOST_CONTEXT_EXPORT"
+  ]
+
+  public_configs = [
+    ":context_config",
+    "../..:boost_config",
+  ]
+}
