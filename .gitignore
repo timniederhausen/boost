@@ -22,12 +22,12 @@ appveyor.yml
 
 # Exclude project parts we don't need (docs, examples, tests, ...)
 /more
-/libs/**/doc
-/libs/**/test
-/libs/**/sample
-/libs/**/samples
-/libs/**/examples
-/libs/**/example
-/libs/**/bench
+/libs/*/**/doc
+/libs/*/**/test
+/libs/*/**/sample
+/libs/*/**/samples
+/libs/*/**/examples
+/libs/*/**/example
+/libs/*/**/bench
 *.html
 *.md
