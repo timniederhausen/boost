@@ -12,6 +12,22 @@
 /.project
 /.pydevproject
 
+# Exclude Boost CI configs
+**/.github/*
+**/.drone/*
+**/.circleci/*
+**/.appveyor.yml
+**/.travis.yml
+appveyor.yml
+
+# Exclude project parts we don't need (docs, examples, tests, ...)
 /more
-**/doc/*
+/libs/**/doc
+/libs/**/test
+/libs/**/sample
+/libs/**/samples
+/libs/**/examples
+/libs/**/example
+/libs/**/bench
 *.html
+*.md
