@@ -24,6 +24,7 @@ appveyor.yml
 /more
 /libs/**/doc
 /libs/**/test
+!/libs/test
 /libs/**/sample
 /libs/**/samples
 /libs/**/examples
