@@ -18,7 +18,7 @@ source_set("context") {
   if (is_win) {
     _binary_format = "pe"
   } else if (is_apple) {
-    _binary_format = "mach-o"
+    _binary_format = "macho"
   } else {
     _binary_format = "elf"
   }
