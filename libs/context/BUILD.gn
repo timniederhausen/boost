@@ -25,6 +25,8 @@ source_set("context") {
 
   if (is_win) {
     _abi = "ms"
+  } else if (current_cpu == "arm" || current_cpu == "arm64") {
+    _abi = "aapcs"
   } else {
     _abi = "sysv"
   }
@@ -33,8 +35,9 @@ source_set("context") {
     _arch = "i386"
   } else if (current_cpu == "x64") {
     _arch = "x86_64"
+  } else {
+    _arch = current_cpu
   }
-  # TODO
 
   if (is_win && !is_clang) {
     if (current_cpu == "arm" || current_cpu == "arm64") {
