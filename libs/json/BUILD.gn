@@ -1,0 +1,13 @@
+static_library("json") {
+  sources = [
+    "src/src.cpp",
+  ]
+
+  public_configs = [
+    "../..:boost_config",
+  ]
+
+  public_deps = [
+    "../system",
+  ]
+}
